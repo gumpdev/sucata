@@ -1,0 +1,21 @@
+package audio
+
+import lua_common "../lua_common"
+
+AUDIO_NAMESPACE :: lua_common.LuaNamespace {
+	name      = "audio",
+	functions = []lua_common.LuaFunction {
+		PLAY_FUNCTION,
+		STOP_FUNCTION,
+		PAUSE_FUNCTION,
+		UNPAUSE_FUNCTION,
+		SET_VOLUME_FUNCTION,
+		GET_VOLUME_FUNCTION,
+		SET_PITCH_FUNCTION,
+		GET_PITCH_FUNCTION,
+		SET_GROUP_VOLUME_FUNCTION,
+		GET_GROUP_VOLUME_FUNCTION,
+		SET_GROUP_PITCH_FUNCTION,
+		GET_GROUP_PITCH_FUNCTION,
+	},
+}

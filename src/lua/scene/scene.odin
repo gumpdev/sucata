@@ -1,0 +1,21 @@
+package scene
+
+import lua_common "../lua_common"
+
+SCENE_NAMESPACE :: lua_common.LuaNamespace {
+	name      = "scene",
+	functions = []lua_common.LuaFunction {
+		LOAD_SCENE_FUNCTION,
+		SPAWN_FUNCTION,
+		SPAWNS_FUNCTION,
+		FIND_BY_ID_FUNCTION,
+		DESTROY_FUNCTION,
+		DESTROYS_FUNCTION,
+		ADD_TAG_FUNCTION,
+		REMOVE_TAG_FUNCTION,
+		GET_ENTITIES_FUNCTION,
+		GET_ENTITIES_BY_TAG_FUNCTION,
+		CLEAR_ENTITIES_FUNCTION,
+		HAS_TAG_FUNCTION,
+	},
+}

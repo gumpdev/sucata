@@ -1,0 +1,25 @@
+{
+	"statusbar_command.commands": [
+		{
+			"text": "🖥️ Build Shaders",
+			"command": "workbench.action.tasks.runTask",
+			"arguments": [
+				"Build Shaders"
+			]
+		},
+		{
+			"text": "🏗️ Build Project",
+			"command": "workbench.action.tasks.runTask",
+			"arguments": [
+				"Build Project"
+			]
+		},
+		{
+			"text": "▶ Run Test",
+			"command": "workbench.action.tasks.runTask",
+			"arguments": [
+				"Run Project"
+			]
+		}
+	]
+}

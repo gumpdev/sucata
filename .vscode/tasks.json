@@ -1,0 +1,59 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build Project",
+			"type": "shell",
+			"windows": {
+				"command": "odin build . -out:sucata.exe",
+			},
+			"osx": {
+				"command": "odin build . -out:sucata -target:darwin_arm64",
+			},
+			"linux": {
+				"command": "odin build . -out:sucata",
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "Run Project",
+			"type": "shell",
+			"windows": {
+				"command": "./sucata.exe run test"
+			},
+			"command": "./sucata run test",
+			"dependsOn": "Build Project",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "Build Shaders",
+			"type": "shell",
+			"windows": {
+				"command": "./sokol-shdc/build-shaders-win.cmd"
+			},
+			"osx": {
+				"command": "./sokol-shdc/build-shaders-macos.sh"
+			},
+			"linux": {
+				"command": "./sokol-shdc/build-shaders-macos.sh"
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		}
+	]
+}
