@@ -91,8 +91,6 @@ custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 	module_path, ok := strings.replace_all(module_str, ".", "/")
 	defer delete(module_path)
 
-	fmt.printf("[Lua Loader] Procurando módulo: %s -> %s\n", module_str, module_path)
-
 	asset_patterns := []string {
 		fmt.tprintf("src://%s.lua", module_path),
 		fmt.tprintf("src://%s/init.lua", module_path),
@@ -119,7 +117,6 @@ custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 	for pattern in fs_patterns {
 		full_path := path.get_path(pattern)
 		if os.exists(full_path) {
-			fmt.printf("[Lua Loader] ✓ Encontrado no filesystem: %s\n", full_path)
 			data, read_ok := os.read_entire_file(full_path)
 			if read_ok {
 				code := strings.clone_to_cstring(string(data))
@@ -133,7 +130,6 @@ custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 		}
 	}
 
-	fmt.printf("[Lua Loader] ✗ Módulo não encontrado: %s\n", module_str)
 	return 0
 }
 
