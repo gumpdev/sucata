@@ -30,7 +30,6 @@ add_hoverable :: proc(id: string, x, y, width, height: f32, z_index: i32, fixed:
 }
 
 process_hoverables :: proc() {
-	context.allocator = context.temp_allocator
 	_hoverables := hoverables[:]
 	sort.quick_sort_proc(_hoverables, proc(a, b: Hoverable) -> int {
 		if a.z_index < b.z_index {

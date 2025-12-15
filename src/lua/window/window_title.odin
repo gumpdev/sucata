@@ -35,8 +35,8 @@ GET_WINDOW_TITLE_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		title_cstring := strings.clone_to_cstring(core.windowConfig.title, context.temp_allocator)
-		defer delete(title_cstring, context.temp_allocator)
+		title_cstring := strings.clone_to_cstring(core.windowConfig.title)
+		defer delete(title_cstring)
 
 		lua.pushstring(L, title_cstring)
 

@@ -116,8 +116,8 @@ load_font :: proc(file_path: string, font_size: f32) -> ^Font {
 		},
 	)
 
-	path_cstr := strings.clone_to_cstring(font_name, context.temp_allocator)
-	defer delete_cstring(path_cstr, context.temp_allocator)
+	path_cstr := strings.clone_to_cstring(font_name,)
+	defer delete_cstring(path_cstr)
 
 	view := sg.make_view({texture = {image = image}, label = path_cstr})
 

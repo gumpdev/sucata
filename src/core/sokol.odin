@@ -72,8 +72,6 @@ init_sokol :: proc() {
 init_callback :: proc "c" () {
 	context = DEFAULT_CONTEXT
 
-	init_temp_arena()
-
 	st.setup()
 	sg.setup(
 		{

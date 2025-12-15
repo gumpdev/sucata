@@ -223,7 +223,6 @@ draw_render_queue :: proc() {
 }
 
 order_render_queue :: proc() {
-	context.allocator = context.temp_allocator
 	sort.quick_sort_proc(
 		renderQueue[:],
 		proc(a: common.GraphicObjectProps, b: common.GraphicObjectProps) -> int {

@@ -67,8 +67,8 @@ load_image :: proc(file_path: string) -> Image {
 
 	stbi.image_free(pixels)
 
-	path_cstr := strings.clone_to_cstring(file_path, context.temp_allocator)
-	defer delete_cstring(path_cstr, context.temp_allocator)
+	path_cstr := strings.clone_to_cstring(file_path)
+	defer delete_cstring(path_cstr)
 	view := sg.make_view({texture = {image = image}, label = path_cstr})
 	images_loaded[file_path] = Image {
 		width  = w,
