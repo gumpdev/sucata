@@ -106,7 +106,6 @@ cleanup_callback :: proc "c" () {
 	audio_shutdown()
 	graphics.shutdown_graphics()
 
-	// Close Lua VM to free all Lua memory
 	if LUA_GLOBAL_STATE != nil {
 		lua.close(LUA_GLOBAL_STATE)
 		LUA_GLOBAL_STATE = nil
