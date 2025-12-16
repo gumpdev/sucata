@@ -211,13 +211,6 @@ init_lua :: proc(path: string, entity_file: string = "") {
 	}
 }
 
-shutdown_lua :: proc() {
-	if core.LUA_GLOBAL_STATE != nil {
-		lua.close(core.LUA_GLOBAL_STATE)
-		core.LUA_GLOBAL_STATE = nil
-	}
-}
-
 create_namespaces :: proc(L: ^lua.State) {
 	lua.newtable(L)
 	for namespace in lua_namespaces {

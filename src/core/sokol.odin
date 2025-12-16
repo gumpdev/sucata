@@ -9,6 +9,7 @@ import sapp "shared:sokol/app"
 import sg "shared:sokol/gfx"
 import shelpers "shared:sokol/helpers"
 import st "shared:sokol/time"
+import lua "vendor:lua/5.4"
 
 delta_time: f64 = 0.016
 time_scale: f64 = 1.0
@@ -104,6 +105,13 @@ cleanup_callback :: proc "c" () {
 	cleanup_entities()
 	audio_shutdown()
 	graphics.shutdown_graphics()
+
+	// Close Lua VM to free all Lua memory
+	if LUA_GLOBAL_STATE != nil {
+		lua.close(LUA_GLOBAL_STATE)
+		LUA_GLOBAL_STATE = nil
+	}
+
 	sg.shutdown()
 }
 

@@ -147,7 +147,12 @@ unload_font :: proc(font_name: string) {
 		free(font.bitmap)
 		delete(font.char_data)
 		free(font)
-		delete(font_name)
+		for key in loaded_fonts {
+			if key == font_name {
+				delete(key)
+				break
+			}
+		}
 		delete_key(&loaded_fonts, font_name)
 	}
 }

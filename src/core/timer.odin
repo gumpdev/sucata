@@ -79,6 +79,7 @@ update_timers :: proc(delta_time: f64) {
 
 cleanup_timers :: proc() {
 	for id, timer in timers {
+		lua.L_unref(LUA_GLOBAL_STATE, lua.REGISTRYINDEX, timer.callback)
 		delete(id)
 		free(timer)
 	}

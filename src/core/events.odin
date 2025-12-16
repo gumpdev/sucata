@@ -1,6 +1,7 @@
 package core
 
 import common "../common"
+import lua "vendor:lua/5.4"
 
 event_handlers: map[string][dynamic]common.EventHandler = {}
 
@@ -53,6 +54,9 @@ emit_event :: proc(event: string, data: i32) {
 
 cleanup_event_handlers :: proc() {
 	for event, handlers in event_handlers {
+		for handler in handlers {
+			lua.L_unref(LUA_GLOBAL_STATE, lua.REGISTRYINDEX, handler.function)
+		}
 		delete(handlers)
 	}
 	delete(event_handlers)
