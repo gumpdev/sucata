@@ -7,6 +7,7 @@ import "core:c"
 import sg "shared:sokol/gfx"
 
 text_ib: sg.Buffer
+text_shader: sg.Shader
 text_buffers_inited: bool
 text_pipeline: sg.Pipeline
 text_sampler: sg.Sampler
@@ -15,7 +16,7 @@ init_text_indices :: proc() {
 	if text_buffers_inited {
 		return
 	}
-	text_shader := shader_text.load_text_shader()
+	text_shader = shader_text.load_text_shader()
 	text_pipeline = sg.make_pipeline(
 		{
 			shader = text_shader,
@@ -69,6 +70,7 @@ shutdown_text_buffers :: proc() {
 		sg.destroy_buffer(text_ib)
 		sg.destroy_pipeline(text_pipeline)
 		sg.destroy_sampler(text_sampler)
+		sg.destroy_shader(text_shader)
 		text_buffers_inited = false
 	}
 }
@@ -202,6 +204,7 @@ text :: proc(props: common.TextObjectProps) {
 	sg.apply_pipeline(text_pipeline)
 
 	lines := wrap_text(props.text, font, scale, max_width)
+	defer delete(lines)
 
 	line_height := font_size * scale[1]
 	current_y := position[1]

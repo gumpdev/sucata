@@ -57,16 +57,17 @@ load_font :: proc(file_path: string, font_size: f32) -> ^Font {
 	if font_path == "" {
 		font_path = get_default_system_font()
 	}
-	font_name := fmt.tprintf("%s_%f", font_path, font_size)
+	font_name := fmt.aprintf("%s_%f", font_path, font_size, allocator = context.allocator)
 
 	if font, exists := loaded_fonts[font_name]; exists {
+		delete(font_name)
 		return loaded_fonts[font_name]
 	}
 
 	ttf_data: []byte
 	read_ok: bool
 
-	if asset_data, ok := fs.get_asset(font_path); ok && len(asset_data) > 0 { 	// Fazer uma cópia dos dados dos assets para garantir que permanecem válidos
+	if asset_data, ok := fs.get_asset(font_path); ok && len(asset_data) > 0 {
 		ttf_data = make([]byte, len(asset_data))
 		copy(ttf_data, asset_data)
 		read_ok = true
@@ -116,7 +117,7 @@ load_font :: proc(file_path: string, font_size: f32) -> ^Font {
 		},
 	)
 
-	path_cstr := strings.clone_to_cstring(font_name,)
+	path_cstr := strings.clone_to_cstring(font_name)
 	defer delete_cstring(path_cstr)
 
 	view := sg.make_view({texture = {image = image}, label = path_cstr})
@@ -146,6 +147,7 @@ unload_font :: proc(font_name: string) {
 		free(font.bitmap)
 		delete(font.char_data)
 		free(font)
+		delete(font_name)
 		delete_key(&loaded_fonts, font_name)
 	}
 }

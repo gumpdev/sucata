@@ -8,6 +8,7 @@ hex_to_rgba :: proc(color: string) -> [4]f32 {
 
 	if len(hex) == 3 || len(hex) == 4 {
 		expanded := make([]u8, len(hex) * 2)
+		defer delete(expanded)
 		for i in 0 ..< len(hex) {
 			expanded[i * 2] = hex[i]
 			expanded[i * 2 + 1] = hex[i]

@@ -52,11 +52,14 @@ calc_time :: proc() {
 }
 
 init_sokol :: proc() {
+	window_title := strings.clone_to_cstring(windowConfig.title)
+	defer delete(window_title)
+
 	sapp.run(
 		{
 			width = windowConfig.width,
 			height = windowConfig.height,
-			window_title = strings.clone_to_cstring(windowConfig.title),
+			window_title = window_title,
 			allocator = sapp.Allocator(shelpers.allocator(&DEFAULT_CONTEXT)),
 			logger = sapp.Logger(shelpers.logger(&DEFAULT_CONTEXT)),
 			swap_interval = windowConfig.vsync,

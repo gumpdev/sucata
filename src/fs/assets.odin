@@ -108,6 +108,7 @@ find_assets_with_prefix :: proc(prefix: string, allocator := context.allocator) 
 	context.allocator = allocator
 
 	matching := make([dynamic]string)
+	defer delete(matching)
 	for entry in assets.entries {
 		if strings.has_prefix(entry.path, prefix) {
 			append(&matching, entry.path)

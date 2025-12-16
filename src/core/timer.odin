@@ -2,6 +2,7 @@ package core
 
 import "core:crypto"
 import "core:encoding/uuid"
+import lua "vendor:lua/5.4"
 
 Timer :: struct {
 	left_time: f64,
@@ -50,6 +51,7 @@ pause_timer :: proc(id: string) {
 }
 stop_timer :: proc(id: string) {
 	if timer := timers[id]; timer != nil {
+		lua.L_unref(LUA_GLOBAL_STATE, lua.REGISTRYINDEX, timer.callback)
 		delete_key(&timers, id)
 		free(timer)
 	}

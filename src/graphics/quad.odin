@@ -8,6 +8,7 @@ import sg "shared:sokol/gfx"
 
 quad_ib: sg.Buffer
 quad_buffers_inited: bool
+quad_shader: sg.Shader
 quad_pipeline: sg.Pipeline
 quad_sampler: sg.Sampler
 
@@ -15,7 +16,7 @@ init_quad_indices :: proc() {
 	if quad_buffers_inited {
 		return
 	}
-	quad_shader := shader_quad.load_rect_shader()
+	quad_shader = shader_quad.load_rect_shader()
 	quad_pipeline = sg.make_pipeline(
 		{
 			shader = quad_shader,
@@ -69,6 +70,7 @@ shutdown_quad_buffers :: proc() {
 		sg.destroy_buffer(quad_ib)
 		sg.destroy_pipeline(quad_pipeline)
 		sg.destroy_sampler(quad_sampler)
+		sg.destroy_shader(quad_shader)
 		quad_buffers_inited = false
 	}
 }

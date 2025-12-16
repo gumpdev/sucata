@@ -33,6 +33,7 @@ EMIT_FUNCTION :: lua_common.LuaFunction {
 		data_ref := lua.L_ref(L, lua.REGISTRYINDEX)
 
 		core.emit_event(event, data_ref)
+		defer lua.L_unref(L, lua.REGISTRYINDEX, data_ref)
 
 		return 0
 	},

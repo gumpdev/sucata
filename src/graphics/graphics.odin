@@ -15,5 +15,6 @@ init_graphics :: proc() {
 shutdown_graphics :: proc() {
 	shutdown_quad_buffers()
 	shutdown_text_buffers()
+	unload_fonts()
 	destroy_images()
 }

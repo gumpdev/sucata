@@ -159,6 +159,7 @@ get_table_array :: proc(L: ^lua.State, table_index: c.int, field: cstring) -> []
 	}
 
 	table_indices := make([dynamic]c.int, 0, length)
+	defer delete(table_indices)
 
 	for i: lua.Integer = 1; i <= lua.Integer(length); i += 1 {
 		lua.rawgeti(L, -1, i)
