@@ -53,7 +53,7 @@ lua_namespaces :: []lua_common.LuaNamespace {
 lua_allocator :: proc "c" (ud: rawptr, ptr: rawptr, osize, nsize: c.size_t) -> (buf: rawptr) {
 	old_size := int(osize)
 	new_size := int(nsize)
-	context = (^runtime.Context)(ud)^
+	context = core.DEFAULT_CONTEXT
 
 	if ptr == nil {
 		data, err := runtime.mem_alloc(new_size)
