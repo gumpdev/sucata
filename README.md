@@ -310,6 +310,7 @@ Some libraries used in Sucata Game Engine:
 
 - [Ellora](https://github.com/elloramir)
 - [ThornDuck](https://github.com/MuriloMGrosso)
+- [Randy](https://github.com/randyprime)
 
 <br>
 <a id="faq"></a>

@@ -25,9 +25,6 @@ delete_entity_id :: proc(entity: ^common.Entity) {
 }
 
 cleanup_entities :: proc() {
-	for id in entities {
-		delete(id)
-	}
 	delete(entities)
 	entities = {}
 }

@@ -80,7 +80,14 @@ load_image :: proc(file_path: string) -> Image {
 }
 
 destroy_images :: proc() {
-	for file_path, view in images_loaded {
+	keys_to_destroy := make([dynamic]string, 0, len(images_loaded))
+	defer delete(keys_to_destroy)
+	
+	for file_path in images_loaded {
+		append(&keys_to_destroy, file_path)
+	}
+	
+	for file_path in keys_to_destroy {
 		destroy_image(file_path)
 	}
 }
