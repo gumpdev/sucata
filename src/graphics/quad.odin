@@ -1,10 +1,10 @@
 package graphics
 
+import sg "../../sokol/gfx"
 import "../camera"
 import "../common"
 import shader_quad "../shaders/quad"
 import "core:c"
-import sg "shared:sokol/gfx"
 
 quad_ib: sg.Buffer
 quad_buffers_inited: bool

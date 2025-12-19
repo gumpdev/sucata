@@ -1,8 +1,8 @@
 package core
 
+import sg "../../sokol/gfx"
 import common "../common"
 import "core:fmt"
-import sg "shared:sokol/gfx"
 import lua "vendor:lua/5.4"
 
 draw_y: f32 = 10.0

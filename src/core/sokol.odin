@@ -1,15 +1,15 @@
 package core
 
+import sapp "../../sokol/app"
+import sg "../../sokol/gfx"
+import sglue "../../sokol/glue"
+import shelpers "../../sokol/helpers"
+import st "../../sokol/time"
 import "../graphics"
 import "base:runtime"
 import "core:fmt"
 import "core:mem"
 import "core:strings"
-import sapp "shared:sokol/app"
-import sg "shared:sokol/gfx"
-import sglue "shared:sokol/glue"
-import shelpers "shared:sokol/helpers"
-import st "shared:sokol/time"
 import lua "vendor:lua/5.4"
 
 delta_time: f64 = 0.016

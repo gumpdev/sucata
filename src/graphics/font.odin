@@ -1,11 +1,11 @@
 package graphics
 
+import sg "../../sokol/gfx"
 import "../fs"
 import "../path"
 import "core:fmt"
 import "core:os"
 import "core:strings"
-import sg "shared:sokol/gfx"
 import stbt "vendor:stb/truetype"
 
 Font :: struct {

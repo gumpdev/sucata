@@ -1,7 +1,7 @@
 package core
 
+import sapp "../../sokol/app"
 import "core:strings"
-import sapp "shared:sokol/app"
 
 InputState :: struct {
 	keys_down:     [512]bool,

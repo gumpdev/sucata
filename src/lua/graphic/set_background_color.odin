@@ -1,10 +1,9 @@
 package graphic
 
-import common "../../common"
+import sg "../../../sokol/gfx"
 import core "../../core"
 import lua_common "../lua_common"
 import "core:c"
-import sg "shared:sokol/gfx"
 import lua "vendor:lua/5.4"
 
 SET_BACKGROUND_FUNCTION :: lua_common.LuaFunction {

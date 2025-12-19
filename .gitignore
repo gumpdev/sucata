@@ -1,3 +1,7 @@
 *.exe
 sucata
 .DS_Store
+sokol/**/*.dll
+sokol/**/*.exp
+sokol/**/*.pdb
+sokol/**/*.lib

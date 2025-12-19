@@ -1,5 +1,5 @@
 package shader_quad
-import sg "shared:sokol/gfx"
+import sg "../../../sokol/gfx"
 /*
     #version:1# (machine generated, don't edit!)
 

@@ -1,7 +1,7 @@
 package graphics
 
+import sg "../../sokol/gfx"
 import "core:math"
-import sg "shared:sokol/gfx"
 
 to_world_space_2d :: proc(
 	position: [2]f32,

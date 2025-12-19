@@ -1,7 +1,7 @@
 package graphics
 
+import sg "../../sokol/gfx"
 import "core:strings"
-import sg "shared:sokol/gfx"
 
 DEFAULT_SAMPLER_KEY :: "__default__"
 

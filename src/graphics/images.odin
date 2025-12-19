@@ -1,10 +1,10 @@
 package graphics
 
+import sg "../../sokol/gfx"
 import "../fs"
 import "../path"
 import "core:image"
 import "core:strings"
-import sg "shared:sokol/gfx"
 import stbi "vendor:stb/image"
 
 DEFAULT_IMAGE_KEY :: "__default__"

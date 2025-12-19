@@ -1,12 +1,11 @@
 package core
 
+import sapp "../../sokol/app"
 import "../common"
 import "../fs"
 import "../graphics"
 import "base:runtime"
-import "core:fmt"
 import "core:sort"
-import sapp "shared:sokol/app"
 import lua "vendor:lua/5.4"
 
 LUA_GLOBAL_STATE: ^lua.State
