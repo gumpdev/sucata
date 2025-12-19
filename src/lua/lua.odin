@@ -50,25 +50,6 @@ lua_namespaces :: []lua_common.LuaNamespace {
 	window.WINDOW_NAMESPACE,
 }
 
-lua_allocator :: proc "c" (ud: rawptr, ptr: rawptr, osize, nsize: c.size_t) -> (buf: rawptr) {
-	old_size := int(osize)
-	new_size := int(nsize)
-	context = core.DEFAULT_CONTEXT
-
-	if ptr == nil {
-		data, err := runtime.mem_alloc(new_size)
-		return raw_data(data) if err == .None else nil
-	} else {
-		if nsize > 0 {
-			data, err := runtime.mem_resize(ptr, old_size, new_size)
-			return raw_data(data) if err == .None else nil
-		} else {
-			runtime.mem_free(ptr)
-			return
-		}
-	}
-}
-
 load_file_as_cstring :: proc(path: string) -> (cstring, bool) {
 	data, ok := os.read_entire_file(path)
 	if !ok {
