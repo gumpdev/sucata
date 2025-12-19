@@ -69,8 +69,6 @@ call_lua_function_with_table_ref :: proc(
 		msg := lua.tostring(L, -1)
 		fmt.println("Error calling Lua function: ", msg)
 		lua.pop(L, 1)
-
-		lua.gc(L, lua.GCCOLLECT, 0)
 	}
 
 	lua.settop(L, top)
