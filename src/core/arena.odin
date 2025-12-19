@@ -6,9 +6,11 @@ temp_arena: mem.Dynamic_Arena
 temp_allocator: mem.Allocator
 TEMP_ARENA_SIZE :: 4 * mem.Megabyte
 
-// Dead Code for while
-
 init_temp_arena :: proc() {
-	mem.dynamic_arena_init(&temp_arena, alignment = 64)
+	mem.dynamic_arena_init(&temp_arena, alignment = 64, block_size = TEMP_ARENA_SIZE)
 	temp_allocator = mem.dynamic_arena_allocator(&temp_arena)
+}
+
+reset_temp_arena :: proc() {
+	free_all(temp_allocator)
 }

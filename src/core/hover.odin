@@ -74,5 +74,5 @@ process_hoverables :: proc() {
 			}
 		}
 	}
-	hoverables = {}
+	clear(&hoverables)
 }

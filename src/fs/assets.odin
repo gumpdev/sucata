@@ -69,9 +69,12 @@ load_assets :: proc(asset_path: string, allocator := context.allocator) -> bool 
 
 unload_assets :: proc(allocator := context.allocator) {
 	context.allocator = allocator
-	delete(assets.entries)
-	delete(assets.decompressed_data)
-	assets^ = {}
+	if assets != nil {
+		delete(assets.entries)
+		delete(assets.decompressed_data)
+		free(assets)
+		assets = nil
+	}
 }
 
 get_asset :: proc(path: string, allocator := context.allocator) -> (data: []byte, ok: bool) {

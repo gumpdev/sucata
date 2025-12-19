@@ -29,15 +29,27 @@ draw_debug_info :: proc() {
 		return
 	}
 
-	frame_stats := sg.query_frame_stats()
+	context.temp_allocator = temp_allocator
+
+	frame_stats := sg.query_stats()
 	frame_time_ms := delta_time * 1000.0
 	lua_memory_kb := f64(lua.gc(LUA_GLOBAL_STATE, lua.GCCOUNT, 0))
-	draw_calls := frame_stats.num_apply_pipeline
+	draw_calls := frame_stats.cur_frame.num_draw
+	alives :=
+		frame_stats.total.buffers.alive +
+		frame_stats.total.images.alive +
+		frame_stats.total.pipelines.alive +
+		frame_stats.total.samplers.alive +
+		frame_stats.total.views.alive +
+		frame_stats.total.shaders.alive
 
 	draw_info_text(fmt.tprintf("FPS: %d", fps))
 	draw_info_text(fmt.tprintf("Entities: %d", get_scene_count()))
+	draw_info_text(fmt.tprintf("Render Queue: %d", len(renderQueue)))
 	draw_info_text(fmt.tprintf("Draw Calls: %d", draw_calls))
 	draw_info_text(fmt.tprintf("Frame Time: %.2f ms", frame_time_ms))
 	draw_info_text(fmt.tprintf("Lua Memory: %.2f KB", lua_memory_kb))
+	draw_info_text(fmt.tprintf("Sokol Obj Alives: %d", alives))
+
 	draw_y = 10.0
 }

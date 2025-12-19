@@ -81,6 +81,7 @@ load_file_as_cstring :: proc(path: string) -> (cstring, bool) {
 
 custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 	context = core.DEFAULT_CONTEXT
+	context.temp_allocator = core.temp_allocator
 
 	module_name := lua.tostring(L, 1)
 	if module_name == nil {
@@ -197,7 +198,7 @@ init_lua :: proc(path: string, entity_file: string = "") {
 	if !ok {
 		return
 	}
-	defer delete_cstring(code)
+	defer delete(code)
 
 	if lua.L_dostring(L, code) != 0 {
 		err := lua.tostring(L, -1)

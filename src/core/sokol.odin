@@ -7,6 +7,7 @@ import "core:mem"
 import "core:strings"
 import sapp "shared:sokol/app"
 import sg "shared:sokol/gfx"
+import sglue "shared:sokol/glue"
 import shelpers "shared:sokol/helpers"
 import st "shared:sokol/time"
 import lua "vendor:lua/5.4"
@@ -79,7 +80,7 @@ init_callback :: proc "c" () {
 	st.setup()
 	sg.setup(
 		{
-			environment = shelpers.glue_environment(),
+			environment = sglue.environment(),
 			allocator = sg.Allocator(shelpers.allocator(&DEFAULT_CONTEXT)),
 			logger = sg.Logger(shelpers.logger(&DEFAULT_CONTEXT)),
 		},
@@ -117,8 +118,8 @@ cleanup_callback :: proc "c" () {
 elapsed_time := 0.0
 frame_callback :: proc "c" () {
 	context = DEFAULT_CONTEXT
-
-	mem.dynamic_arena_free_all(&temp_arena)
+	context.temp_allocator = temp_allocator
+	defer reset_temp_arena()
 
 	sapp.show_mouse(windowConfig.visible_mouse)
 	sapp.lock_mouse(windowConfig.lock_mouse)
@@ -136,7 +137,7 @@ frame_callback :: proc "c" () {
 		load_action = .CLEAR,
 		clear_value = clear_color,
 	}
-	sg.begin_pass({swapchain = shelpers.glue_swapchain(), action = pass_action})
+	sg.begin_pass({swapchain = sglue.swapchain(), action = pass_action})
 
 	if windowConfig.keep_aspect > 0 {
 		screen_width := sapp.width()
