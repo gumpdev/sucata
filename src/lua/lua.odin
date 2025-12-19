@@ -168,7 +168,7 @@ load_path :: proc() {
 }
 
 init_lua :: proc(path: string, entity_file: string = "") {
-	L := lua.newstate(lua_allocator, &core.DEFAULT_CONTEXT)
+	L := lua.L_newstate()
 	core.LUA_GLOBAL_STATE = L
 
 	lua.L_openlibs(L)

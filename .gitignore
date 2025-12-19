@@ -7,3 +7,7 @@ sokol/**/*.dll
 sokol/**/*.exp
 sokol/**/*.pdb
 sokol/**/*.lib
+sokol/**/*.so
+sokol/**/*.dylib
+sokol/**/*.a
+*.dSYM/**/*
