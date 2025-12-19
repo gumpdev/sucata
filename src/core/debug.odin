@@ -45,7 +45,6 @@ draw_debug_info :: proc() {
 
 	draw_info_text(fmt.tprintf("FPS: %d", fps))
 	draw_info_text(fmt.tprintf("Entities: %d", get_scene_count()))
-	draw_info_text(fmt.tprintf("Render Queue: %d", len(renderQueue)))
 	draw_info_text(fmt.tprintf("Draw Calls: %d", draw_calls))
 	draw_info_text(fmt.tprintf("Frame Time: %.2f ms", frame_time_ms))
 	draw_info_text(fmt.tprintf("Lua Memory: %.2f KB", lua_memory_kb))

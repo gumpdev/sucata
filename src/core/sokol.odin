@@ -113,6 +113,7 @@ cleanup_callback :: proc "c" () {
 	}
 
 	sg.shutdown()
+	cleanup_temp_arena()
 }
 
 elapsed_time := 0.0

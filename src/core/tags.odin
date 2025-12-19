@@ -60,6 +60,7 @@ remove_entity_tags :: proc(entity_id: string) {
 cleanup_tags :: proc() {
 	for tag, tag_list in tags {
 		delete(tag_list)
+		delete(tag)
 	}
 	delete(tags)
 	tags = {}

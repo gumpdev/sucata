@@ -14,3 +14,7 @@ init_temp_arena :: proc() {
 reset_temp_arena :: proc() {
 	free_all(temp_allocator)
 }
+
+cleanup_temp_arena :: proc() {
+	mem.dynamic_arena_destroy(&temp_arena)
+}

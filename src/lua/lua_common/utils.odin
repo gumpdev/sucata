@@ -206,7 +206,9 @@ create_lua_table :: proc(L: ^lua.State, data: LuaTable) -> i32 {
 			lua.pushnumber(L, lua.Number(value.(f32)))
 		case c.int:
 			if value.(c.int) > 0 {
-				lua.rawgeti(L, lua.REGISTRYINDEX, lua.Integer(value.(c.int)))
+				ref := value.(c.int)
+				lua.rawgeti(L, lua.REGISTRYINDEX, lua.Integer(ref))
+				lua.L_unref(L, lua.REGISTRYINDEX, ref)
 			} else {
 				lua.pushnumber(L, lua.Number(value.(c.int)))
 			}
@@ -221,6 +223,7 @@ create_lua_table :: proc(L: ^lua.State, data: LuaTable) -> i32 {
 		case LuaTable:
 			nested_table_ref := create_lua_table(L, value.(LuaTable))
 			lua.rawgeti(L, lua.REGISTRYINDEX, lua.Integer(nested_table_ref))
+			lua.L_unref(L, lua.REGISTRYINDEX, nested_table_ref)
 		}
 		key_cstring := strings.clone_to_cstring(key)
 		defer delete(key_cstring)

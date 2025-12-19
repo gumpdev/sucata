@@ -58,6 +58,7 @@ cleanup_event_handlers :: proc() {
 			lua.L_unref(LUA_GLOBAL_STATE, lua.REGISTRYINDEX, handler.function)
 		}
 		delete(handlers)
+		delete(event)
 	}
 	delete(event_handlers)
 	event_handlers = {}

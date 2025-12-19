@@ -4,6 +4,7 @@ import "../common"
 import "../fs"
 import "../graphics"
 import "base:runtime"
+import "core:fmt"
 import "core:sort"
 import sapp "shared:sokol/app"
 import lua "vendor:lua/5.4"
@@ -46,6 +47,9 @@ destroy :: proc(entity: ^common.Entity) {
 spawn :: proc(entity: ^common.Entity) -> string {
 	if entity == nil {
 		return ""
+	}
+	if scene == nil {
+		scene = [dynamic]^common.Entity{}
 	}
 
 	append(&scene, entity)
@@ -127,6 +131,12 @@ run_free :: proc() {
 	}
 	delete(scene)
 	scene = {}
+
+	delete(renderQueue)
+	renderQueue = {}
+
+	delete(destroyQueue)
+	destroyQueue = {}
 
 	if is_build_mode {
 		fs.unload_assets()

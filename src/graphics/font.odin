@@ -136,8 +136,15 @@ load_font :: proc(file_path: string, font_size: f32) -> ^Font {
 
 unload_fonts :: proc() {
 	for font_name, font in loaded_fonts {
-		unload_font(font_name)
+		sg.destroy_image(sg.query_view_image(font.image))
+		sg.destroy_view(font.image)
+		free(font.bitmap)
+		delete(font.char_data)
+		free(font)
+		delete(font_name)
 	}
+	delete(loaded_fonts)
+	loaded_fonts = {}
 }
 
 unload_font :: proc(font_name: string) {

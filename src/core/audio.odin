@@ -16,7 +16,7 @@ Sound :: struct {
 AudioMixer :: struct {
 	engine:  ma.engine,
 	groups:  map[string]^ma.sound_group,
-	sounds:  [512]Sound,
+	sounds:  [dynamic]Sound,
 	next_id: u32,
 }
 
@@ -57,23 +57,16 @@ audio_shutdown :: proc() {
 	for &s in mixer.sounds {
 		if s.is_valid {
 			ma.sound_stop(&s.sound)
-		}
-	}
-
-	for &s in mixer.sounds {
-		if s.is_valid {
 			ma.sound_uninit(&s.sound)
 			ma.decoder_uninit(&s.decoder)
 			s.is_valid = false
 		}
 	}
 
-	for g in mixer.groups {
-		ma.sound_group_uninit(mixer.groups[g])
-		free(mixer.groups[g])
-	}
-	for g in mixer.groups {
-		delete(g)
+	for key, group in mixer.groups {
+		ma.sound_group_uninit(group)
+		free(group)
+		delete(key)
 	}
 	delete(mixer.groups)
 	mixer.groups = {}

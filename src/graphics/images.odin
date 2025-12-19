@@ -80,16 +80,15 @@ load_image :: proc(file_path: string) -> Image {
 }
 
 destroy_images :: proc() {
-	keys_to_destroy := make([dynamic]string, 0, len(images_loaded))
-	defer delete(keys_to_destroy)
-
-	for file_path in images_loaded {
-		append(&keys_to_destroy, file_path)
+	for file_path, value in images_loaded {
+		sg.destroy_image(sg.query_view_image(value.view))
+		sg.destroy_view(value.view)
+		delete(file_path)
 	}
-
-	for file_path in keys_to_destroy {
-		destroy_image(file_path)
-	}
+	delete(images_loaded)
+	delete(images_used)
+	images_loaded = {}
+	images_used = {}
 }
 
 destroy_image :: proc(file_path: string) {
