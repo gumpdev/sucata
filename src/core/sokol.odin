@@ -8,7 +8,6 @@ import st "../../sokol/time"
 import "../graphics"
 import "base:runtime"
 import "core:fmt"
-import "core:mem"
 import "core:strings"
 import lua "vendor:lua/5.4"
 
