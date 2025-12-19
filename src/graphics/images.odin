@@ -83,7 +83,6 @@ destroy_images :: proc() {
 	for file_path, value in images_loaded {
 		sg.destroy_image(sg.query_view_image(value.view))
 		sg.destroy_view(value.view)
-		delete(file_path)
 	}
 	delete(images_loaded)
 	delete(images_used)

@@ -29,13 +29,15 @@ remove_handler :: proc(owner: string, event: string, function_ref: i32) {
 }
 
 remove_handler_owner :: proc(owner: string) {
-	for event, handlers in event_handlers {
-		for i: int = 0; i < len(handlers); i += 1 {
-			handler := handlers[i]
-			if handler.owner == owner {
-				ordered_remove(&event_handlers[event], i)
+	for event in event_handlers {
+		handlers := &event_handlers[event]
+		for i := len(handlers) - 1; i >= 0; i -= 1 {
+			if handlers[i].owner == owner {
+				ordered_remove(handlers, i)
 			}
 		}
+	}
+	for event in event_handlers {
 		if len(event_handlers[event]) == 0 {
 			delete(event_handlers[event])
 			delete_key(&event_handlers, event)
@@ -58,7 +60,6 @@ cleanup_event_handlers :: proc() {
 			lua.L_unref(LUA_GLOBAL_STATE, lua.REGISTRYINDEX, handler.function)
 		}
 		delete(handlers)
-		delete(event)
 	}
 	delete(event_handlers)
 	event_handlers = {}

@@ -181,7 +181,6 @@ free_obj :: proc(entity: ^common.Entity) {
 	remove_handler_owner(entity.id)
 	remove_entity_tags(entity.id)
 	delete_entity_id(entity)
-	delete(entity.id)
 	free(entity)
 }
 

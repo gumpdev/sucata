@@ -67,7 +67,6 @@ audio_shutdown :: proc() {
 	for key, group in mixer.groups {
 		ma.sound_group_uninit(group)
 		free(group)
-		delete(key)
 	}
 	delete(mixer.groups)
 	mixer.groups = {}

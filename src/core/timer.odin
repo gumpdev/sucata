@@ -58,6 +58,8 @@ stop_timer :: proc(id: string) {
 }
 
 update_timers :: proc(delta_time: f64) {
+	timers_to_stop := make([dynamic]string, context.temp_allocator)
+
 	for id, timer in timers {
 		if timer.running {
 			timer.left_time -= delta_time
@@ -67,7 +69,7 @@ update_timers :: proc(delta_time: f64) {
 					timer.left_time = timer.time
 				} else {
 					if timer.one_shot {
-						stop_timer(id)
+						append(&timers_to_stop, id)
 					} else {
 						pause_timer(id)
 					}
@@ -75,12 +77,15 @@ update_timers :: proc(delta_time: f64) {
 			}
 		}
 	}
+
+	for id in timers_to_stop {
+		stop_timer(id)
+	}
 }
 
 cleanup_timers :: proc() {
 	for id, timer in timers {
 		lua.L_unref(LUA_GLOBAL_STATE, lua.REGISTRYINDEX, timer.callback)
-		delete(id)
 		free(timer)
 	}
 	delete(timers)
