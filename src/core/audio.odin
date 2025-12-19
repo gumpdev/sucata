@@ -31,6 +31,7 @@ audio_engine_init :: proc() -> bool {
 		return false
 	}
 
+	mixer.sounds = make([dynamic]Sound)
 	create_audio_group("default")
 	mixer.next_id = 1
 	return true
@@ -70,6 +71,7 @@ audio_shutdown :: proc() {
 	}
 	delete(mixer.groups)
 	mixer.groups = {}
+	delete(mixer.sounds)
 
 	ma.engine_uninit(&mixer.engine)
 }
@@ -79,9 +81,6 @@ find_free_slot :: proc() -> (^Sound, bool) {
 		if !s.is_valid {
 			return &s, true
 		}
-	}
-
-	for &s in mixer.sounds {
 		if s.is_valid && !ma.sound_is_looping(&s.sound) {
 			if !ma.sound_is_playing(&s.sound) && ma.sound_at_end(&s.sound) {
 				ma.sound_uninit(&s.sound)
@@ -92,7 +91,8 @@ find_free_slot :: proc() -> (^Sound, bool) {
 		}
 	}
 
-	return nil, false
+	append(&mixer.sounds, Sound{})
+	return &mixer.sounds[len(mixer.sounds) - 1], true
 }
 
 find_sound_by_id :: proc(id: u32) -> (^Sound, bool) {
