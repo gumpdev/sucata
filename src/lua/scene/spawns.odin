@@ -38,9 +38,9 @@ SPAWNS_FUNCTION :: lua_common.LuaFunction {
 				spawned_id := core.spawn(entity)
 
 				if spawned_id != "" {
-				entity_id_c := strings.clone_to_cstring(spawned_id)
-				defer delete(entity_id_c)
-				lua.pushstring(L, entity_id_c)
+					entity_id_c := strings.clone_to_cstring(spawned_id)
+					defer delete(entity_id_c)
+					lua.pushstring(L, entity_id_c)
 					lua.rawseti(L, spawned_ids_table, lua.Integer(i))
 				}
 			}

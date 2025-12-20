@@ -36,10 +36,10 @@ ON_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-	owner_id := lua_common.get_entity_id(L, 1)
-	defer delete(owner_id)
-	event := strings.clone_from_cstring(lua.tostring(L, 2))
-	defer delete(event)
+		owner_id := lua_common.get_entity_id(L, 1)
+		defer delete(owner_id)
+		event := strings.clone_from_cstring(lua.tostring(L, 2))
+		defer delete(event)
 		func_ref := lua.L_ref(L, lua.REGISTRYINDEX)
 
 		core.add_handler(owner_id, event, func_ref)

@@ -30,10 +30,10 @@ HAS_TAG_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-	entity_id := lua_common.get_entity_id(L, 1)
-	defer delete(entity_id)
-	tag := strings.clone_from_cstring(lua.tostring(L, 2))
-	defer delete(tag)
+		entity_id := lua_common.get_entity_id(L, 1)
+		defer delete(entity_id)
+		tag := strings.clone_from_cstring(lua.tostring(L, 2))
+		defer delete(tag)
 		entity := core.find_by_id(entity_id)
 
 		if entity == nil {
