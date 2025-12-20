@@ -70,7 +70,7 @@ get_entity_id :: proc(L: ^lua.State, table_index: c.int) -> string {
 	if lua.istable(L, table_index) {
 		return get_table_string(L, table_index, "id", "")
 	} else if lua.isstring(L, table_index) {
-		return string(lua.tostring(L, table_index))
+		return strings.clone_from_cstring(lua.tostring(L, table_index))
 	}
 	return ""
 }

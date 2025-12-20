@@ -24,7 +24,10 @@ SET_WINDOW_TITLE_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		core.set_window_title(string(lua.tostring(L, 1)))
+		title := strings.clone_from_cstring(lua.tostring(L, 1))
+		defer delete(title)
+
+		core.set_window_title(title)
 
 		return 0
 	},

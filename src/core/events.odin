@@ -1,19 +1,23 @@
 package core
 
 import common "../common"
+import "core:strings"
 import lua "vendor:lua/5.4"
 
 event_handlers: map[string][dynamic]common.EventHandler = {}
 
 add_handler :: proc(owner: string, event: string, function_ref: i32) {
-	if _, exists := event_handlers[event]; !exists {
-		event_handlers[event] = [dynamic]common.EventHandler{}
+	event_key := strings.clone(event)
+	owner_clone := strings.clone(owner)
+
+	if _, exists := event_handlers[event_key]; !exists {
+		event_handlers[event_key] = [dynamic]common.EventHandler{}
 	}
 	handler := common.EventHandler {
 		function = function_ref,
-		owner    = owner,
+		owner    = owner_clone,
 	}
-	append(&event_handlers[event], handler)
+	append(&event_handlers[event_key], handler)
 }
 
 remove_handler :: proc(owner: string, event: string, function_ref: i32) {
@@ -21,6 +25,7 @@ remove_handler :: proc(owner: string, event: string, function_ref: i32) {
 		for i: int = 0; i < len(handlers); i += 1 {
 			handler := handlers[i]
 			if handler.owner == owner && handler.function == function_ref {
+				delete(handler.owner)
 				ordered_remove(&handlers, i)
 				break
 			}
@@ -33,6 +38,7 @@ remove_handler_owner :: proc(owner: string) {
 		handlers := &event_handlers[event]
 		for i := len(handlers) - 1; i >= 0; i -= 1 {
 			if handlers[i].owner == owner {
+				delete(handlers[i].owner)
 				ordered_remove(handlers, i)
 			}
 		}
@@ -58,8 +64,10 @@ cleanup_event_handlers :: proc() {
 	for event, handlers in event_handlers {
 		for handler in handlers {
 			lua.L_unref(LUA_GLOBAL_STATE, lua.REGISTRYINDEX, handler.function)
+			delete(handler.owner)
 		}
 		delete(handlers)
+		delete(event)
 	}
 	delete(event_handlers)
 	event_handlers = {}

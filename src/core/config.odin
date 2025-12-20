@@ -34,7 +34,7 @@ set_mouse_visible :: proc(mouse_visible: b32) {
 }
 
 set_window_title :: proc(title: string) {
-	windowConfig.title = title
+	windowConfig.title = strings.clone(title)
 
 	title_cstring := strings.clone_to_cstring(title)
 	defer delete(title_cstring)

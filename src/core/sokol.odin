@@ -111,6 +111,8 @@ cleanup_callback :: proc "c" () {
 		LUA_GLOBAL_STATE = nil
 	}
 
+	delete(windowConfig.title)
+
 	sg.shutdown()
 	cleanup_temp_arena()
 }

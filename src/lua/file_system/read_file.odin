@@ -25,7 +25,8 @@ READ_FILE_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		file_path := string(lua.tostring(L, 1))
+		file_path := strings.clone_from_cstring(lua.tostring(L, 1))
+		defer delete(file_path)
 
 		content, ok := fs.read_file_as_string(file_path)
 

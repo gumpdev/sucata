@@ -24,7 +24,8 @@ GET_ENTITIES_BY_TAG_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		tag := string(lua.tostring(L, 1))
+		tag := strings.clone_from_cstring(lua.tostring(L, 1))
+		defer delete(tag)
 
 		entitys := core.get_entities(tag)
 

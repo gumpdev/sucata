@@ -4,6 +4,7 @@ import core "../../core"
 import "../../fs"
 import lua_common "../lua_common"
 import "core:c"
+import "core:strings"
 import lua "vendor:lua/5.4"
 
 WRITE_FUNCTION :: lua_common.LuaFunction {
@@ -23,8 +24,10 @@ WRITE_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		file_path := string(lua.tostring(L, 1))
-		content := string(lua.tostring(L, 2))
+		file_path := strings.clone_from_cstring(lua.tostring(L, 1))
+		defer delete(file_path)
+		content := strings.clone_from_cstring(lua.tostring(L, 2))
+		defer delete(content)
 
 		ok := fs.write_file(file_path, transmute([]u8)content)
 		lua.pushboolean(L, b32(ok))

@@ -24,8 +24,9 @@ PAUSE_TIMER_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		timer_id := lua.tostring(L, 1)
-		core.pause_timer(string(timer_id))
+		timer_id := strings.clone_from_cstring(lua.tostring(L, 1))
+		defer delete(timer_id)
+		core.pause_timer(timer_id)
 
 		return 0
 	},

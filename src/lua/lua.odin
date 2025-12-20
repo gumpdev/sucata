@@ -82,10 +82,11 @@ custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 
 	for pattern in asset_patterns {
 		if asset_data, ok := fs.get_asset(pattern); ok && len(asset_data) > 0 {
-			code := strings.clone_to_cstring(string(asset_data))
-			defer delete_cstring(code)
+			chunk_name := strings.clone_to_cstring(pattern)
 
-			if lua.L_loadstring(L, code) == .OK {
+			result := lua.L_loadbuffer(L, raw_data(asset_data), len(asset_data), chunk_name)
+
+			if result == .OK {
 				return 1
 			}
 		}
@@ -101,11 +102,12 @@ custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 		if os.exists(full_path) {
 			data, read_ok := os.read_entire_file(full_path)
 			if read_ok {
-				code := strings.clone_to_cstring(string(data))
-				delete(data)
-				defer delete_cstring(code)
+				chunk_name := strings.clone_to_cstring(full_path)
 
-				if lua.L_loadstring(L, code) == .OK {
+				result := lua.L_loadbuffer(L, raw_data(data), len(data), chunk_name)
+				delete(data)
+
+				if result == .OK {
 					return 1
 				}
 			}
@@ -153,7 +155,9 @@ init_lua :: proc(path: string, entity_file: string = "") {
 	core.LUA_GLOBAL_STATE = L
 
 	lua.L_openlibs(L)
-	setup_garbage_collector(L, default_gc_config)
+
+	lua.gc(L, lua.GCSTOP, 0)
+
 	create_namespaces(L)
 	load_path()
 
@@ -177,20 +181,39 @@ init_lua :: proc(path: string, entity_file: string = "") {
 	}
 
 	if !ok {
+		lua.gc(L, lua.GCRESTART, 0)
+		setup_garbage_collector(L, default_gc_config)
 		return
 	}
-	defer delete(code)
 
-	if lua.L_dostring(L, code) != 0 {
+	code_str := string(code)
+	chunk_name := strings.clone_to_cstring(path)
+
+	if lua.L_loadbuffer(L, raw_data(code_str), len(code_str), chunk_name) != .OK {
+		err := lua.tostring(L, -1)
+		fmt.println("Erro ao carregar Lua:", err)
+		lua.pop(L, 1)
+		delete(code)
+		lua.gc(L, lua.GCRESTART, 0)
+		setup_garbage_collector(L, default_gc_config)
+		return
+	}
+
+	delete(code)
+
+	if lua.pcall(L, 0, lua.MULTRET, 0) != 0 {
 		err := lua.tostring(L, -1)
 		fmt.println("Erro Lua:", err)
 		lua.pop(L, 1)
-	} else {
-		if lua.gettop(L) > 0 && lua.isstring(L, -1) {
-			msg := lua.tostring(L, -1)
-			fmt.print(msg)
-		}
 	}
+
+	if lua.gettop(L) > 0 && lua.isstring(L, -1) {
+		msg := lua.tostring(L, -1)
+		fmt.print(msg)
+	}
+
+	lua.gc(L, lua.GCRESTART, 0)
+	setup_garbage_collector(L, default_gc_config)
 }
 
 create_namespaces :: proc(L: ^lua.State) {

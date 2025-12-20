@@ -3,6 +3,7 @@ package core
 import camera "../camera"
 import "core:math"
 import "core:sort"
+import "core:strings"
 Hoverable :: struct {
 	id:      string,
 	x:       f32,
@@ -17,8 +18,9 @@ hoverables: [dynamic]Hoverable
 hover := ""
 
 add_hoverable :: proc(id: string, x, y, width, height: f32, z_index: i32, fixed: bool) {
+	id_clone := strings.clone(id)
 	hoverable := Hoverable {
-		id      = id,
+		id      = id_clone,
 		x       = x,
 		y       = y,
 		width   = width,
@@ -73,6 +75,9 @@ process_hoverables :: proc() {
 				break
 			}
 		}
+	}
+	for hoverable in hoverables {
+		delete(hoverable.id)
 	}
 	clear(&hoverables)
 }

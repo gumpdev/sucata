@@ -4,6 +4,7 @@ import core "../../core"
 import "../../fs"
 import lua_common "../lua_common"
 import "core:c"
+import "core:strings"
 import lua "vendor:lua/5.4"
 
 RENAME_FUNCTION :: lua_common.LuaFunction {
@@ -28,8 +29,10 @@ RENAME_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		old_path := string(lua.tostring(L, 1))
-		new_path := string(lua.tostring(L, 2))
+		old_path := strings.clone_from_cstring(lua.tostring(L, 1))
+		defer delete(old_path)
+		new_path := strings.clone_from_cstring(lua.tostring(L, 2))
+		defer delete(new_path)
 
 		fs.rename(old_path, new_path)
 

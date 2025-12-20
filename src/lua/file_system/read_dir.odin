@@ -25,7 +25,8 @@ READ_DIR_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		dir_path := string(lua.tostring(L, 1))
+		dir_path := strings.clone_from_cstring(lua.tostring(L, 1))
+		defer delete(dir_path)
 
 		content, ok := fs.read_dir(dir_path)
 

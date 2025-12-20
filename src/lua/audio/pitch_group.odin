@@ -4,6 +4,7 @@ import core "../../core"
 import lua_common "../lua_common"
 import "core:c"
 import "core:fmt"
+import "core:strings"
 import lua "vendor:lua/5.4"
 
 GET_GROUP_PITCH_FUNCTION :: lua_common.LuaFunction {
@@ -23,7 +24,8 @@ GET_GROUP_PITCH_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		group_id := string(lua.tostring(L, 1))
+		group_id := strings.clone_from_cstring(lua.tostring(L, 1))
+		defer delete(group_id)
 		lua.pushnumber(L, lua.Number(core.get_group_pitch(group_id)))
 
 		return 1
@@ -53,7 +55,8 @@ SET_GROUP_PITCH_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		group_id := string(lua.tostring(L, 1))
+		group_id := strings.clone_from_cstring(lua.tostring(L, 1))
+		defer delete(group_id)
 		pitch := lua.tonumber(L, 2)
 
 		core.set_group_pitch(group_id, f32(pitch))

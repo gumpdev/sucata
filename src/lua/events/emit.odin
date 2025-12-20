@@ -4,6 +4,7 @@ import core "../../core"
 import lua_common "../lua_common"
 import "base:runtime"
 import "core:c"
+import "core:strings"
 import lua "vendor:lua/5.4"
 
 EMIT_FUNCTION :: lua_common.LuaFunction {
@@ -29,7 +30,8 @@ EMIT_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		event := string(lua.tostring(L, 1))
+		event := strings.clone_from_cstring(lua.tostring(L, 1))
+		defer delete(event)
 		data_ref := lua.L_ref(L, lua.REGISTRYINDEX)
 
 		core.emit_event(event, data_ref)

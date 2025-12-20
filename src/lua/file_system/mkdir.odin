@@ -4,6 +4,7 @@ import core "../../core"
 import "../../fs"
 import lua_common "../lua_common"
 import "core:c"
+import "core:strings"
 import lua "vendor:lua/5.4"
 
 MKDIR_FUNCTION :: lua_common.LuaFunction {
@@ -23,7 +24,8 @@ MKDIR_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		dir_path := string(lua.tostring(L, 1))
+		dir_path := strings.clone_from_cstring(lua.tostring(L, 1))
+		defer delete(dir_path)
 		fs.mkdir(dir_path)
 
 		return 0

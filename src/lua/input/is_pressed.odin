@@ -4,6 +4,7 @@ import core "../../core"
 import lua_common "../lua_common"
 import "base:runtime"
 import "core:c"
+import "core:strings"
 import lua "vendor:lua/5.4"
 
 IS_PRESSED_FUNCTION :: lua_common.LuaFunction {
@@ -25,7 +26,8 @@ IS_PRESSED_FUNCTION :: lua_common.LuaFunction {
 				return 0
 			}
 
-			key_name := string(lua.tostring(L, c.int(i)))
+			key_name := strings.clone_from_cstring(lua.tostring(L, c.int(i)))
+			defer delete(key_name)
 
 			if core.is_pressed(key_name) {
 				lua.pushboolean(L, true)

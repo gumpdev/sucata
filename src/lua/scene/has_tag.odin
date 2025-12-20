@@ -4,6 +4,7 @@ import core "../../core"
 import lua_common "../lua_common"
 import "base:runtime"
 import "core:c"
+import "core:strings"
 import lua "vendor:lua/5.4"
 
 HAS_TAG_FUNCTION :: lua_common.LuaFunction {
@@ -29,8 +30,10 @@ HAS_TAG_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		entity_id := lua_common.get_entity_id(L, 1)
-		tag := string(lua.tostring(L, 2))
+	entity_id := lua_common.get_entity_id(L, 1)
+	defer delete(entity_id)
+	tag := strings.clone_from_cstring(lua.tostring(L, 2))
+	defer delete(tag)
 		entity := core.find_by_id(entity_id)
 
 		if entity == nil {

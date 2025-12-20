@@ -4,6 +4,7 @@ import core "../../core"
 import lua_common "../lua_common"
 import "base:runtime"
 import "core:c"
+import "core:strings"
 import lua "vendor:lua/5.4"
 
 FIND_BY_ID_FUNCTION :: lua_common.LuaFunction {
@@ -23,7 +24,8 @@ FIND_BY_ID_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		entity_id := string(lua.tostring(L, 1))
+		entity_id := strings.clone_from_cstring(lua.tostring(L, 1))
+		defer delete(entity_id)
 		entity := core.find_by_id(entity_id)
 
 		if entity == nil {

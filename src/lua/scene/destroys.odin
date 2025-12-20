@@ -34,8 +34,9 @@ DESTROYS_FUNCTION :: lua_common.LuaFunction {
 			lua.rawgeti(L, 1, lua.Integer(i))
 			if lua.istable(L, -1) {
 				entity_id := lua_common.get_entity_id(L, lua.gettop(L))
+				defer delete(entity_id)
 				entity := core.find_by_id(entity_id)
-
+				
 				if entity != nil {
 					core.add_to_destroy_queue(entity)
 				} else {

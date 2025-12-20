@@ -22,15 +22,16 @@ DESTROY_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		entity_id := lua_common.get_entity_id(L, 1)
-		entity := core.find_by_id(entity_id)
-
-		if entity != nil {
-			core.add_to_destroy_queue(entity)
-			lua.pushboolean(L, true)
-		} else {
-			lua.pushboolean(L, false)
-		}
+	entity_id := lua_common.get_entity_id(L, 1)
+	defer delete(entity_id)
+	entity := core.find_by_id(entity_id)
+	
+	if entity != nil {
+		core.add_to_destroy_queue(entity)
+		lua.pushboolean(L, true)
+	} else {
+		lua.pushboolean(L, false)
+	}
 
 		return 1
 	},

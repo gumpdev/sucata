@@ -4,6 +4,7 @@ import sg "../../../sokol/gfx"
 import core "../../core"
 import lua_common "../lua_common"
 import "core:c"
+import "core:strings"
 import lua "vendor:lua/5.4"
 
 SET_BACKGROUND_FUNCTION :: lua_common.LuaFunction {
@@ -23,7 +24,8 @@ SET_BACKGROUND_FUNCTION :: lua_common.LuaFunction {
 			return 0
 		}
 
-		color_str := string(lua.tostring(L, 1))
+		color_str := strings.clone_from_cstring(lua.tostring(L, 1))
+		defer delete(color_str)
 		color := hex_to_rgba(color_str)
 
 		core.clear_color = sg.Color {
