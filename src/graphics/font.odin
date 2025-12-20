@@ -61,7 +61,7 @@ load_font :: proc(file_path: string, font_size: f32) -> ^Font {
 
 	if font, exists := loaded_fonts[font_name]; exists {
 		delete(font_name)
-		return loaded_fonts[font_name]
+		return font
 	}
 
 	ttf_data: []byte
@@ -105,6 +105,7 @@ load_font :: proc(file_path: string, font_size: f32) -> ^Font {
 	if result <= 0 {
 		free(bitmap)
 		delete(char_data)
+		delete(font_name)
 		return nil
 	}
 
@@ -141,7 +142,6 @@ unload_fonts :: proc() {
 		free(font.bitmap)
 		delete(font.char_data)
 		free(font)
-		delete(font_name)
 	}
 	delete(loaded_fonts)
 	loaded_fonts = {}
