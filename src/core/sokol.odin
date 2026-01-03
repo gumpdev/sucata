@@ -106,11 +106,6 @@ cleanup_callback :: proc "c" () {
 	audio_shutdown()
 	graphics.shutdown_graphics()
 
-	if LUA_GLOBAL_STATE != nil {
-		lua.close(LUA_GLOBAL_STATE)
-		LUA_GLOBAL_STATE = nil
-	}
-
 	delete(windowConfig.title)
 
 	sg.shutdown()
@@ -164,6 +159,10 @@ frame_callback :: proc "c" () {
 
 	clear_input()
 	process_destroy_queue()
+
+	if LUA_GLOBAL_STATE != nil {
+		lua.gc(LUA_GLOBAL_STATE, lua.GCCOLLECT, 0)
+	}
 }
 
 event_callback :: proc "c" (event: ^sapp.Event) {
