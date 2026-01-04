@@ -161,7 +161,7 @@ frame_callback :: proc "c" () {
 	process_destroy_queue()
 
 	if LUA_GLOBAL_STATE != nil {
-		lua.gc(LUA_GLOBAL_STATE, lua.GCCOLLECT, 0)
+		lua.gc(LUA_GLOBAL_STATE, lua.GCSTEP, 5)
 	}
 }
 

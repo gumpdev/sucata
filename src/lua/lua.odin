@@ -22,19 +22,15 @@ import timens "time"
 import lua "vendor:lua/5.4"
 
 GC_Config :: struct {
-	pause:        c.int,
-	step_mul:     c.int,
-	step_size:    c.int,
-	emergency_gc: bool,
-	auto_gc:      bool,
+	pause:    c.int,
+	step_mul: c.int,
+	auto_gc:  bool,
 }
 
 default_gc_config := GC_Config {
-	pause        = 200,
-	step_mul     = 200,
-	step_size    = 1024,
-	emergency_gc = true,
-	auto_gc      = true,
+	pause    = 100,
+	step_mul = 150,
+	auto_gc  = true,
 }
 
 lua_namespaces :: []lua_common.LuaNamespace {
@@ -85,6 +81,7 @@ custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 			chunk_name := strings.clone_to_cstring(pattern)
 
 			result := lua.L_loadbuffer(L, raw_data(asset_data), len(asset_data), chunk_name)
+			delete_cstring(chunk_name)
 
 			if result == .OK {
 				return 1
@@ -105,6 +102,7 @@ custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 				chunk_name := strings.clone_to_cstring(full_path)
 
 				result := lua.L_loadbuffer(L, raw_data(data), len(data), chunk_name)
+				delete_cstring(chunk_name)
 				delete(data)
 
 				if result == .OK {
@@ -168,7 +166,7 @@ init_lua :: proc(path: string, entity_file: string = "") {
 
 	if entity_file != "" {
 		lua_code := fmt.tprintf(
-			"local Entity = require('%s')\nsucata.scene.load_scene({{Entity()}})\nprint('oieu')",
+			"local Entity = require('%s')\nsucata.scene.load_scene({{Entity()}})\n",
 			entity_file,
 		)
 		ok = true
@@ -188,6 +186,7 @@ init_lua :: proc(path: string, entity_file: string = "") {
 
 	code_str := string(code)
 	chunk_name := strings.clone_to_cstring(path)
+	defer delete(chunk_name)
 
 	if lua.L_loadbuffer(L, raw_data(code_str), len(code_str), chunk_name) != .OK {
 		err := lua.tostring(L, -1)

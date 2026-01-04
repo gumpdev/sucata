@@ -62,6 +62,8 @@ RECT_FUNCTION :: lua_common.LuaFunction {
 			atlas_height = atlas_size
 		}
 
+		color_rgba := hex_to_rgba(color)
+
 		props := common.QuadObjectProps {
 			position = [2]f32{x, y},
 			size = [2]f32{width, height},

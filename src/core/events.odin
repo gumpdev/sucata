@@ -7,8 +7,8 @@ import lua "vendor:lua/5.4"
 event_handlers: map[string][dynamic]common.EventHandler = {}
 
 add_handler :: proc(owner: string, event: string, function_ref: i32) {
-	event_key := strings.clone(event)
-	owner_clone := strings.clone(owner)
+	event_key := strings.clone(event, allocator = context.temp_allocator)
+	owner_clone := strings.clone(owner, allocator = context.temp_allocator)
 
 	if _, exists := event_handlers[event_key]; !exists {
 		event_handlers[event_key] = [dynamic]common.EventHandler{}
@@ -25,6 +25,7 @@ remove_handler :: proc(owner: string, event: string, function_ref: i32) {
 		for i: int = 0; i < len(handlers); i += 1 {
 			handler := handlers[i]
 			if handler.owner == owner && handler.function == function_ref {
+				lua.L_unref(LUA_GLOBAL_STATE, lua.REGISTRYINDEX, handler.function)
 				delete(handler.owner)
 				ordered_remove(&handlers, i)
 				break
