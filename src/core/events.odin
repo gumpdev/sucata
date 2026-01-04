@@ -44,11 +44,15 @@ remove_handler_owner :: proc(owner: string) {
 			}
 		}
 	}
+	empty_events := make([dynamic]string, context.temp_allocator)
 	for event in event_handlers {
 		if len(event_handlers[event]) == 0 {
-			delete(event_handlers[event])
-			delete_key(&event_handlers, event)
+			append(&empty_events, event)
 		}
+	}
+	for event in empty_events {
+		delete(event_handlers[event])
+		delete_key(&event_handlers, event)
 	}
 }
 

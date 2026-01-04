@@ -45,7 +45,7 @@ load_image :: proc(file_path: string) -> Image {
 	pixels: [^]u8
 
 	if asset_data, ok := fs.get_asset(file_path); ok && len(asset_data) > 0 {
-		pixels = stbi.load_from_memory(&asset_data[0], i32(len(asset_data)), &w, &h, nil, 4)
+		pixels = stbi.load_from_memory(raw_data(asset_data), i32(len(asset_data)), &w, &h, nil, 4)
 	} else {
 		path_cstr := strings.clone_to_cstring(path.get_path(file_path))
 		defer delete_cstring(path_cstr)

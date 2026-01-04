@@ -23,7 +23,7 @@ load_assets :: proc(asset_path: string, allocator := context.allocator) -> bool 
 
 	header_size := (^u64)(raw_data(file_data))^
 
-	if int(header_size) > len(file_data) - 8 {
+	if header_size == 0 || int(header_size) > len(file_data) - 8 {
 		return false
 	}
 
@@ -43,6 +43,11 @@ load_assets :: proc(asset_path: string, allocator := context.allocator) -> bool 
 	if len(entries) > 0 {
 		last_entry := entries[len(entries) - 1]
 		total_uncompressed_size = last_entry.offset + last_entry.size
+	}
+
+	if total_uncompressed_size <= 0 || total_uncompressed_size > 1024 * 1024 * 1024 {
+		delete(entries)
+		return false
 	}
 
 	decompressed_buffer := make([]byte, total_uncompressed_size, allocator)

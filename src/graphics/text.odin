@@ -82,7 +82,11 @@ calculate_text_width :: proc(text: string, font: ^Font, scale: [2]f32) -> f32 {
 		if char < 32 || char >= 128 {
 			continue
 		}
-		baked_char := font.char_data[char - 32]
+		char_index := int(char) - 32
+		if char_index < 0 || char_index >= len(font.char_data) {
+			continue
+		}
+		baked_char := font.char_data[char_index]
 		width += f32(baked_char.xadvance) * scale[0]
 	}
 	return width
@@ -142,7 +146,11 @@ wrap_text :: proc(text: string, font: ^Font, scale: [2]f32, max_width: f32) -> [
 			continue
 		}
 
-		baked_char := font.char_data[char - 32]
+		char_index := int(char) - 32
+		if char_index < 0 || char_index >= len(font.char_data) {
+			continue
+		}
+		baked_char := font.char_data[char_index]
 		char_width := f32(baked_char.xadvance) * scale[0]
 
 		if current_width + char_width > max_width && current_width > 0 {
@@ -162,8 +170,11 @@ wrap_text :: proc(text: string, font: ^Font, scale: [2]f32, max_width: f32) -> [
 				for k in word_start ..< i + 1 {
 					c := text[k]
 					if c >= 32 && c < 128 {
-						bc := font.char_data[c - 32]
-						current_width += f32(bc.xadvance) * scale[0]
+						c_idx := int(c) - 32
+						if c_idx >= 0 && c_idx < len(font.char_data) {
+							bc := font.char_data[c_idx]
+							current_width += f32(bc.xadvance) * scale[0]
+						}
 					}
 				}
 			} else {
@@ -225,7 +236,11 @@ text :: proc(props: common.TextObjectProps) {
 			if char < 32 || char >= 128 {
 				continue
 			}
-			baked_char := font.char_data[char - 32]
+			char_index := int(char) - 32
+			if char_index < 0 || char_index >= len(font.char_data) {
+				continue
+			}
+			baked_char := font.char_data[char_index]
 
 			char_width := f32(baked_char.x1 - baked_char.x0)
 			char_height := f32(baked_char.y1 - baked_char.y0)
