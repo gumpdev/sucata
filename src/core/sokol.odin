@@ -110,6 +110,10 @@ cleanup_callback :: proc "c" () {
 
 	sg.shutdown()
 	cleanup_temp_arena()
+
+	if LUA_GLOBAL_STATE != nil {
+		lua.close(LUA_GLOBAL_STATE)
+	}
 }
 
 elapsed_time := 0.0

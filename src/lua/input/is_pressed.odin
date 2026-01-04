@@ -26,8 +26,7 @@ IS_PRESSED_FUNCTION :: lua_common.LuaFunction {
 				return 0
 			}
 
-			key_name := strings.clone_from_cstring(lua.tostring(L, c.int(i)))
-			defer delete(key_name)
+			key_name := string(lua.tostring(L, c.int(i)))
 
 			if core.is_pressed(key_name) {
 				lua.pushboolean(L, true)

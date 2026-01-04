@@ -192,6 +192,7 @@ mouse_scroll :: proc() -> (f32, f32) {return input_state.scroll[0], input_state.
 
 string_to_mouse :: proc(s: string) -> sapp.Mousebutton {
 	sv := strings.to_lower(s)
+	defer delete(sv)
 
 	switch sv {
 	case "mouse_left":
@@ -207,6 +208,7 @@ string_to_mouse :: proc(s: string) -> sapp.Mousebutton {
 
 string_to_keycode :: proc(s: string) -> sapp.Keycode {
 	sv := strings.to_lower(s)
+	defer delete(sv)
 
 	switch sv {
 	case "a":
