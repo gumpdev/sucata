@@ -39,6 +39,7 @@ remove_handler_owner :: proc(owner: string) {
 		handlers := &event_handlers[event]
 		for i := len(handlers) - 1; i >= 0; i -= 1 {
 			if handlers[i].owner == owner {
+				lua.L_unref(LUA_GLOBAL_STATE, lua.REGISTRYINDEX, handlers[i].function)
 				delete(handlers[i].owner)
 				ordered_remove(handlers, i)
 			}
