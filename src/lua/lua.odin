@@ -59,15 +59,12 @@ load_file_as_cstring :: proc(path: string) -> (cstring, bool) {
 custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 	context = core.DEFAULT_CONTEXT
 
-	fmt.printfln("Custom loader called")
-
 	module_name := lua.tostring(L, 1)
 	if module_name == nil {
 		lua.pushstring(L, "module not found")
 		return 1
 	}
 
-	fmt.printfln("Custom module name: %s", module_name)
 	module_str := strings.clone_from_cstring(module_name)
 	module_path, ok := strings.replace_all(module_str, ".", "/")
 	defer delete(module_path)
@@ -85,9 +82,7 @@ custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 	}
 
 	for pattern in asset_patterns {
-		fmt.printfln("Find pattern %s", pattern)
 		if asset_data, ok := fs.get_asset(pattern); ok && len(asset_data) > 0 {
-			fmt.printfln("Pattern %s found", pattern)
 			chunk_name := strings.clone_to_cstring(pattern)
 
 			result := lua.L_loadbuffer(L, raw_data(asset_data), len(asset_data), chunk_name)
