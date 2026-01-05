@@ -60,7 +60,7 @@ The goal is to make a create game experience similar good and smooth using only 
 ## 🔧 Installation
 
 1. Install [Odin](https://odin-lang.org)
-2. Install [Sokol odin](https://github.com/floooh/sokol-odin) on the shared folder of the odin
+2. [Build the sokol binaries](github.com/floooh/sokol-odin?tab=readme-ov-file#build) on the `/sokol/` folder.
 3. Clone the repository:
 	 ```bash
 	 git clone https://github.com/gumpdev/sucata.git
