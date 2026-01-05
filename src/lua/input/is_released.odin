@@ -2,7 +2,6 @@ package input
 
 import core "../../core"
 import lua_common "../lua_common"
-import "base:runtime"
 import "core:c"
 import "core:strings"
 import lua "vendor:lua/5.4"
@@ -12,16 +11,12 @@ IS_RELEASED_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		arg_count := lua.gettop(L)
-		if arg_count == 0 {
-			lua.pushstring(L, "is_released expects at least 1 argument (key/button name)")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 1, "is_released") do return 0
 
+		arg_count := lua.gettop(L)
 		for i in 1 ..= arg_count {
 			if !lua.isstring(L, c.int(i)) {
-				lua.pushstring(L, "All arguments must be strings")
+				lua.pushstring(L, "is_released expects all arguments to be strings")
 				lua.error(L)
 				return 0
 			}

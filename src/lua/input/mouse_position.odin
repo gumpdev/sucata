@@ -2,7 +2,6 @@ package input
 
 import core "../../core"
 import lua_common "../lua_common"
-import "base:runtime"
 import "core:c"
 import lua "vendor:lua/5.4"
 

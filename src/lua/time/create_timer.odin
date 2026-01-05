@@ -1,6 +1,5 @@
 package timenamespace
 
-import common "../../common"
 import core "../../core"
 import lua_common "../lua_common"
 import "core:c"
@@ -12,20 +11,8 @@ CREATE_TIMER_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		if lua.gettop(L) < 2 {
-			lua.pushstring(
-				L,
-				"create_timer expects at least 2 arguments (function, table or number)",
-			)
-			lua.error(L)
-			return 0
-		}
-
-		if !lua.isfunction(L, 1) {
-			lua.pushstring(L, "First argument must be a function")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 2, "create_timer") do return 0
+		if !lua_common.validate_function(L, 1, "create_timer") do return 0
 
 		lua.pushvalue(L, 1)
 		callback_ref: i32 = lua.L_ref(L, lua.REGISTRYINDEX)

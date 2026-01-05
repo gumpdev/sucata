@@ -5,14 +5,12 @@ import "../../core"
 import "core:c"
 import "core:crypto"
 import "core:encoding/uuid"
-import "core:fmt"
 import "core:strings"
 import lua "vendor:lua/5.4"
 
 lua_table_to_entity :: proc(L: ^lua.State, table_index: c.int) -> ^common.Entity {
 	context.random_generator = crypto.random_generator()
 	id := uuid.to_string(uuid.generate_v4())
-	name := get_table_string(L, table_index, "name", "")
 	init := get_table_ref(L, table_index, "init")
 	draw := get_table_ref(L, table_index, "draw")
 	update := get_table_ref(L, table_index, "update")

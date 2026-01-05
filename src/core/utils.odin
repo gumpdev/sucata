@@ -25,7 +25,7 @@ call_lua_function :: proc(L: ^lua.State, function_ref: i32) -> bool {
 	result := lua.pcall(L, 0, 0, 0)
 	if result != 0 {
 		msg := lua.tostring(L, -1)
-		fmt.println("Error calling Lua function: ", msg)
+		fmt.println("[ERROR]", msg)
 		lua.pop(L, 1)
 
 		lua.gc(L, lua.GCCOLLECT, 0)
@@ -67,7 +67,7 @@ call_lua_function_with_table_ref :: proc(
 	result := lua.pcall(L, 1, 0, 0)
 	if result != 0 {
 		msg := lua.tostring(L, -1)
-		fmt.println("Error calling Lua function: ", msg)
+		fmt.println("[ERROR]", msg)
 		lua.pop(L, 1)
 	}
 
@@ -82,13 +82,4 @@ get_memory_usage :: proc(L: ^lua.State) -> (kb_used: c.int, bytes_used: c.int) {
 	kb_used = lua.gc(L, lua.GCCOUNT, 0)
 	bytes_used = lua.gc(L, lua.GCCOUNTB, 0)
 	return
-}
-
-monitor_gc :: proc(L: ^lua.State) {
-	if L == nil do return
-
-	kb, bytes := get_memory_usage(L)
-	count := lua.gettop(L)
-	fmt.printf("GC Monitor: %d na stack\n", count)
-	fmt.printf("GC Monitor: %dKB + %d bytes em uso\n", kb, bytes)
 }

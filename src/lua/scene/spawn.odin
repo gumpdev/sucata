@@ -12,17 +12,8 @@ SPAWN_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		if lua.gettop(L) < 1 {
-			lua.pushstring(L, "spawn expects at least 1 arguments (entity)")
-			lua.error(L)
-			return 0
-		}
-
-		if !lua.istable(L, 1) {
-			lua.pushstring(L, "First argument must be a table")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 1, "spawn") do return 0
+		if !lua_common.validate_table(L, 1, "spawn") do return 0
 
 		entity := lua_common.create_entity_by_lua(L, 1)
 		core.spawn(entity)

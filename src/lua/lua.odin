@@ -9,7 +9,6 @@ import "./file_system"
 import mathns "./math"
 import "./scene"
 import "./window"
-import "base:runtime"
 import "core:c"
 import "core:fmt"
 import "core:os"
@@ -70,10 +69,10 @@ custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 	defer delete(module_path)
 
 	asset_patterns := []string {
-		fmt.tprintf("src://%s.lua", module_path),
-		fmt.tprintf("src://%s/init.lua", module_path),
-		fmt.tprintf("%s.lua", module_path),
-		fmt.tprintf("%s/init.lua", module_path),
+		strings.clone(fmt.tprintf("src://%s.lua", module_path)),
+		strings.clone(fmt.tprintf("src://%s/init.lua", module_path)),
+		strings.clone(fmt.tprintf("%s.lua", module_path)),
+		strings.clone(fmt.tprintf("%s/init.lua", module_path)),
 	}
 
 	for pattern in asset_patterns {
@@ -90,8 +89,8 @@ custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 	}
 
 	fs_patterns := []string {
-		fmt.tprintf("%s.lua", module_path),
-		fmt.tprintf("%s/init.lua", module_path),
+		strings.clone(fmt.tprintf("%s.lua", module_path)),
+		strings.clone(fmt.tprintf("%s/init.lua", module_path)),
 	}
 
 	for pattern in fs_patterns {
@@ -154,8 +153,6 @@ init_lua :: proc(path: string, entity_file: string = "") {
 
 	lua.L_openlibs(L)
 
-	lua.gc(L, lua.GCSTOP, 0)
-
 	create_namespaces(L)
 	load_path()
 
@@ -187,18 +184,17 @@ init_lua :: proc(path: string, entity_file: string = "") {
 	code_str := string(code)
 	chunk_name := strings.clone_to_cstring(path)
 	defer delete(chunk_name)
+	defer delete(code)
+
+	setup_garbage_collector(L, default_gc_config)
 
 	if lua.L_loadbuffer(L, raw_data(code_str), len(code_str), chunk_name) != .OK {
 		err := lua.tostring(L, -1)
 		fmt.println("Erro ao carregar Lua:", err)
 		lua.pop(L, 1)
-		delete(code)
 		lua.gc(L, lua.GCRESTART, 0)
-		setup_garbage_collector(L, default_gc_config)
 		return
 	}
-
-	delete(code)
 
 	if lua.pcall(L, 0, lua.MULTRET, 0) != 0 {
 		err := lua.tostring(L, -1)
@@ -212,7 +208,6 @@ init_lua :: proc(path: string, entity_file: string = "") {
 	}
 
 	lua.gc(L, lua.GCRESTART, 0)
-	setup_garbage_collector(L, default_gc_config)
 }
 
 create_namespaces :: proc(L: ^lua.State) {

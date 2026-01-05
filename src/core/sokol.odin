@@ -93,6 +93,11 @@ init_callback :: proc "c" () {
 	} else {
 		fmt.printfln("Failed to initialize audio engine")
 	}
+
+	is_game_started = true
+	if scene != nil && len(scene) > 0 {
+		run_init()
+	}
 }
 
 cleanup_callback :: proc "c" () {

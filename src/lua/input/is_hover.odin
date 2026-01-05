@@ -2,7 +2,6 @@ package input
 
 import core "../../core"
 import lua_common "../lua_common"
-import "base:runtime"
 import "core:c"
 import lua "vendor:lua/5.4"
 
@@ -11,24 +10,9 @@ IS_HOVER_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		arg_count := lua.gettop(L)
-		if arg_count < 2 {
-			lua.pushstring(L, "is_hover expects at least 2 argument (entity, table)")
-			lua.error(L)
-			return 0
-		}
-
-		if !lua.isstring(L, 1) && !lua.istable(L, 1) {
-			lua.pushstring(L, "First argument must be a string")
-			lua.error(L)
-			return 0
-		}
-
-		if !lua.istable(L, 2) {
-			lua.pushstring(L, "Second argument must be a table")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 2, "is_hover") do return 0
+		if !lua_common.validate_table_or_string(L, 1, "is_hover") do return 0
+		if !lua_common.validate_table(L, 2, "is_hover") do return 0
 
 		id := lua_common.get_entity_id(L, 1)
 		defer delete(id)

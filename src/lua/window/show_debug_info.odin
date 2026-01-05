@@ -10,12 +10,8 @@ SHOW_DEBUG_INFO_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		arg_count := lua.gettop(L)
-		if arg_count == 0 {
-			lua.pushstring(L, "show_debug_info expects at least 1 argument (boolean)")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 1, "show_debug_info") do return 0
+		if !lua_common.validate_boolean(L, 1, "show_debug_info") do return 0
 
 		show := lua.toboolean(L, 1)
 		core.windowConfig.draw_debug_info = bool(show)

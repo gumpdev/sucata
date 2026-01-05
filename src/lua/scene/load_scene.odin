@@ -11,17 +11,8 @@ LOAD_SCENE_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		if lua.gettop(L) < 1 {
-			lua.pushstring(L, "load_scene expects at least 1 argument (table)")
-			lua.error(L)
-			return 0
-		}
-
-		if !lua.istable(L, 1) {
-			lua.pushstring(L, "First argument must be a table")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 1, "load_scene") do return 0
+		if !lua_common.validate_table(L, 1, "load_scene") do return 0
 
 		entities := [dynamic]^common.Entity{}
 

@@ -12,17 +12,8 @@ SPAWNS_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		if lua.gettop(L) < 1 {
-			lua.pushstring(L, "spawns expects at least 1 arguments (array of entitys)")
-			lua.error(L)
-			return 0
-		}
-
-		if !lua.istable(L, 1) {
-			lua.pushstring(L, "First argument must be a table")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 1, "spawns") do return 0
+		if !lua_common.validate_table(L, 1, "spawns") do return 0
 
 		lua.len(L, 1)
 		table_length := lua.tointeger(L, -1)

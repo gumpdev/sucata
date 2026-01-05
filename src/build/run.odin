@@ -9,12 +9,6 @@ import "core:os"
 import "core:path/filepath"
 import "core:strings"
 
-get_build_assets_path :: proc() -> string {
-	executable_path, _ := filepath.abs(os.args[0])
-	executable_dir := filepath.dir(executable_path)
-	return filepath.join({executable_dir, DEFAULT_ASSETS_PATH})
-}
-
 run :: proc(assets_hash: string) {
 	file_path, _ := filepath.abs(os.args[0])
 	dir_path := filepath.dir(file_path)

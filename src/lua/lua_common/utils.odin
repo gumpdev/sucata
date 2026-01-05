@@ -1,6 +1,7 @@
 package lua_common
 
 import "core:c"
+import "core:fmt"
 import "core:strings"
 import lua "vendor:lua/5.4"
 
@@ -229,4 +230,78 @@ create_lua_table :: proc(L: ^lua.State, data: LuaTable) -> i32 {
 	}
 
 	return lua.L_ref(L, lua.REGISTRYINDEX)
+}
+
+push_lua_error_msg :: proc(L: ^lua.State, msg: string) {
+	msg_cstring := strings.clone_to_cstring(msg)
+	defer delete(msg_cstring)
+	lua.pushstring(L, msg_cstring)
+	lua.error(L)
+}
+
+validate_arg_count :: proc(L: ^lua.State, expected: c.int, func_name: cstring) -> bool {
+	if lua.gettop(L) < expected {
+		error_msg := fmt.tprintf("%s expects %d arguments", func_name, expected)
+		push_lua_error_msg(L, error_msg)
+		return false
+	}
+	return true
+}
+
+validate_number :: proc(L: ^lua.State, index: c.int, func_name: cstring) -> bool {
+	if !lua.isnumber(L, index) {
+		error_msg := fmt.tprintf("%s expects argument %d to be of type number", func_name, index)
+		push_lua_error_msg(L, error_msg)
+		return false
+	}
+	return true
+}
+
+validate_string :: proc(L: ^lua.State, index: c.int, func_name: cstring) -> bool {
+	if !lua.isstring(L, index) {
+		error_msg := fmt.tprintf("%s expects argument %d to be of type string", func_name, index)
+		push_lua_error_msg(L, error_msg)
+		return false
+	}
+	return true
+}
+
+validate_function :: proc(L: ^lua.State, index: c.int, func_name: cstring) -> bool {
+	if !lua.isfunction(L, index) {
+		error_msg := fmt.tprintf("%s expects argument %d to be of type function", func_name, index)
+		push_lua_error_msg(L, error_msg)
+		return false
+	}
+	return true
+}
+
+validate_table :: proc(L: ^lua.State, index: c.int, func_name: cstring) -> bool {
+	if !lua.istable(L, index) {
+		error_msg := fmt.tprintf("%s expects argument %d to be of type table", func_name, index)
+		push_lua_error_msg(L, error_msg)
+		return false
+	}
+	return true
+}
+
+validate_table_or_string :: proc(L: ^lua.State, index: c.int, func_name: cstring) -> bool {
+	if !lua.istable(L, index) && !lua.isstring(L, index) {
+		error_msg := fmt.tprintf(
+			"%s expects argument %d to be of type table or string",
+			func_name,
+			index,
+		)
+		push_lua_error_msg(L, error_msg)
+		return false
+	}
+	return true
+}
+
+validate_boolean :: proc(L: ^lua.State, index: c.int, func_name: cstring) -> bool {
+	if !lua.isboolean(L, index) {
+		error_msg := fmt.tprintf("%s expects argument %d to be of type boolean", func_name, index)
+		push_lua_error_msg(L, error_msg)
+		return false
+	}
+	return true
 }

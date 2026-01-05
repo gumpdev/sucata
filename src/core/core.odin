@@ -15,6 +15,7 @@ width: i32 = 800
 height: i32 = 600
 
 is_build_mode: bool = false
+is_game_started: bool = false
 
 scene: [dynamic]^common.Entity = {}
 renderQueue: [dynamic]common.GraphicObjectProps = {}
@@ -30,7 +31,10 @@ load_scene :: proc(entities: [dynamic]^common.Entity) {
 	}
 
 	scene = entities
-	run_init()
+
+	if is_game_started {
+		run_init()
+	}
 }
 
 destroy :: proc(entity: ^common.Entity) {
@@ -53,7 +57,9 @@ spawn :: proc(entity: ^common.Entity) -> string {
 
 	append(&scene, entity)
 	gObj := scene[len(scene) - 1]
-	init(gObj)
+	if is_game_started {
+		init(gObj)
+	}
 	return gObj.id
 }
 
@@ -181,6 +187,7 @@ free_obj :: proc(entity: ^common.Entity) {
 	remove_handler_owner(entity.id)
 	remove_entity_tags(entity.id)
 	delete_entity_id(entity)
+	delete(entity.id)
 	free(entity)
 }
 

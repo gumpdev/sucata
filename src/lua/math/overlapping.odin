@@ -2,7 +2,6 @@ package mathns
 
 import core "../../core"
 import lua_common "../lua_common"
-import "base:runtime"
 import "core:c"
 import "core:math"
 import lua "vendor:lua/5.4"
@@ -12,16 +11,9 @@ OVERLAPPING_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		if lua.gettop(L) < 2 {
-			lua.pushstring(L, "overlapping expects 2 arguments (rect1, rect2)")
-			lua.error(L)
-			return 0
-		}
-		if !lua.istable(L, 1) || !lua.istable(L, 2) {
-			lua.pushstring(L, "All arguments must be tables")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 2, "overlapping") do return 0
+		if !lua_common.validate_table(L, 1, "overlapping") do return 0
+		if !lua_common.validate_table(L, 2, "overlapping") do return 0
 
 		x1 := lua_common.get_table_number(L, 1, "x", 0)
 		y1 := lua_common.get_table_number(L, 1, "y", 0)

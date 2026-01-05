@@ -7,8 +7,8 @@ import lua "vendor:lua/5.4"
 event_handlers: map[string][dynamic]common.EventHandler = {}
 
 add_handler :: proc(owner: string, event: string, function_ref: i32) {
-	event_key := strings.clone(event, allocator = context.temp_allocator)
-	owner_clone := strings.clone(owner, allocator = context.temp_allocator)
+	event_key := strings.clone(event)
+	owner_clone := strings.clone(owner)
 
 	if _, exists := event_handlers[event_key]; !exists {
 		event_handlers[event_key] = [dynamic]common.EventHandler{}

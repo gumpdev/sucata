@@ -2,7 +2,6 @@ package window
 
 import core "../../core"
 import lua_common "../lua_common"
-import "base:runtime"
 import "core:c"
 import "core:strings"
 import lua "vendor:lua/5.4"
@@ -12,17 +11,8 @@ SET_WINDOW_TITLE_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		arg_count := lua.gettop(L)
-		if arg_count < 1 {
-			lua.pushstring(L, "set_window_title expects at least 1 argument (title)")
-			lua.error(L)
-			return 0
-		}
-		if !lua.isstring(L, 1) {
-			lua.pushstring(L, "First argument must be a string")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 1, "set_window_title") do return 0
+		if !lua_common.validate_string(L, 1, "set_window_title") do return 0
 
 		title := strings.clone_from_cstring(lua.tostring(L, 1))
 		defer delete(title)

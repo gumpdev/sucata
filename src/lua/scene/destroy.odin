@@ -10,17 +10,8 @@ DESTROY_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		if lua.gettop(L) < 1 {
-			lua.pushstring(L, "destroy expects at least 1 argument (entity or id)")
-			lua.error(L)
-			return 0
-		}
-
-		if !lua.istable(L, 1) && !lua.isstring(L, 1) {
-			lua.pushstring(L, "First argument must be a table or string")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 1, "destroy") do return 0
+		if !lua_common.validate_table_or_string(L, 1, "destroy") do return 0
 
 		entity_id := lua_common.get_entity_id(L, 1)
 		defer delete(entity_id)
