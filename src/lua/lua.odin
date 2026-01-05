@@ -114,6 +114,13 @@ custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 	return 0
 }
 
+close_lua :: proc() {
+	if core.LUA_GLOBAL_STATE != nil {
+		lua.close(core.LUA_GLOBAL_STATE)
+		core.LUA_GLOBAL_STATE = nil
+	}
+}
+
 load_path :: proc() {
 	L := core.LUA_GLOBAL_STATE
 
@@ -148,6 +155,8 @@ load_path :: proc() {
 }
 
 init_lua :: proc(path: string, entity_file: string = "") {
+	close_lua()
+
 	L := lua.L_newstate()
 	core.LUA_GLOBAL_STATE = L
 
@@ -176,7 +185,6 @@ init_lua :: proc(path: string, entity_file: string = "") {
 	}
 
 	if !ok {
-		lua.gc(L, lua.GCRESTART, 0)
 		setup_garbage_collector(L, default_gc_config)
 		return
 	}
@@ -186,13 +194,11 @@ init_lua :: proc(path: string, entity_file: string = "") {
 	defer delete(chunk_name)
 	defer delete(code)
 
-	setup_garbage_collector(L, default_gc_config)
-
 	if lua.L_loadbuffer(L, raw_data(code_str), len(code_str), chunk_name) != .OK {
 		err := lua.tostring(L, -1)
 		fmt.println("Erro ao carregar Lua:", err)
 		lua.pop(L, 1)
-		lua.gc(L, lua.GCRESTART, 0)
+		setup_garbage_collector(L, default_gc_config)
 		return
 	}
 
@@ -207,7 +213,7 @@ init_lua :: proc(path: string, entity_file: string = "") {
 		fmt.print(msg)
 	}
 
-	lua.gc(L, lua.GCRESTART, 0)
+	setup_garbage_collector(L, default_gc_config)
 }
 
 create_namespaces :: proc(L: ^lua.State) {

@@ -123,6 +123,7 @@ cleanup_callback :: proc "c" () {
 
 	if LUA_GLOBAL_STATE != nil {
 		lua.close(LUA_GLOBAL_STATE)
+		LUA_GLOBAL_STATE = nil
 	}
 }
 
