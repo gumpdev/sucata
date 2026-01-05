@@ -5,6 +5,7 @@ import sg "../../sokol/gfx"
 import sglue "../../sokol/glue"
 import shelpers "../../sokol/helpers"
 import st "../../sokol/time"
+import "../fs"
 import "../graphics"
 import "base:runtime"
 import "core:fmt"
@@ -115,6 +116,10 @@ cleanup_callback :: proc "c" () {
 
 	sg.shutdown()
 	cleanup_temp_arena()
+
+	if is_build_mode {
+		fs.unload_assets()
+	}
 
 	if LUA_GLOBAL_STATE != nil {
 		lua.close(LUA_GLOBAL_STATE)

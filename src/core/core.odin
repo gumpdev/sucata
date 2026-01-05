@@ -128,6 +128,9 @@ draw :: proc(entity: ^common.Entity) {
 }
 
 run_free :: proc() {
+	if LUA_GLOBAL_STATE == nil {
+		return
+	}
 	if scene == nil {
 		return
 	}
@@ -142,10 +145,6 @@ run_free :: proc() {
 
 	delete(destroyQueue)
 	destroyQueue = {}
-
-	if is_build_mode {
-		fs.unload_assets()
-	}
 }
 
 cleanup_scene :: proc() {
