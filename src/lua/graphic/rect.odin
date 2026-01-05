@@ -11,17 +11,8 @@ RECT_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		if lua.gettop(L) < 1 {
-			lua.pushstring(L, "rect expects at least 1 argument (table)")
-			lua.error(L)
-			return 0
-		}
-
-		if !lua.istable(L, 1) {
-			lua.pushstring(L, "First argument must be a table")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 1, "draw_rect") do return 0
+		if !lua_common.validate_table(L, 1, "draw_rect") do return 0
 
 		x := f32(lua_common.get_table_number(L, 1, "x", 0.0))
 		y := f32(lua_common.get_table_number(L, 1, "y", 0.0))

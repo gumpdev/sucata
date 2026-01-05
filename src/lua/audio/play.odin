@@ -3,7 +3,6 @@ package audio
 import core "../../core"
 import lua_common "../lua_common"
 import "core:c"
-import "core:fmt"
 import lua "vendor:lua/5.4"
 
 PLAY_FUNCTION :: lua_common.LuaFunction {
@@ -11,17 +10,8 @@ PLAY_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		if lua.gettop(L) < 1 {
-			lua.pushstring(L, "play expects at least 1 argument (table)")
-			lua.error(L)
-			return 0
-		}
-
-		if !lua.istable(L, 1) {
-			lua.pushstring(L, "First argument must be a table")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 1, "play") do return 0
+		if !lua_common.validate_table(L, 1, "play") do return 0
 
 		audio_path := lua_common.get_table_string(L, 1, "sound", "")
 		volume := f32(lua_common.get_table_number(L, 1, "volume", 1.0))

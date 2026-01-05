@@ -12,17 +12,9 @@ WRITE_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		if lua.gettop(L) < 2 {
-			lua.pushstring(L, "write expects at least 2 arguments (string, string)")
-			lua.error(L)
-			return 0
-		}
-
-		if !lua.isstring(L, 1) || !lua.isstring(L, 2) {
-			lua.pushstring(L, "Both arguments must be strings")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 2, "write") do return 0
+		if !lua_common.validate_string(L, 1, "write") do return 0
+		if !lua_common.validate_string(L, 2, "write") do return 0
 
 		file_path := strings.clone_from_cstring(lua.tostring(L, 1))
 		defer delete(file_path)

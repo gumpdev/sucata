@@ -22,17 +22,8 @@ SET_CAMERA_ZOOM_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		arg_count := lua.gettop(L)
-		if arg_count < 1 {
-			lua.pushstring(L, "set_camera_zoom expects 1 argument (zoom)")
-			lua.error(L)
-			return 0
-		}
-		if !lua.isnumber(L, 1) {
-			lua.pushstring(L, "Argument must be a number")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 1, "set_camera_zoom") do return 0
+		if !lua_common.validate_number(L, 1, "set_camera_zoom") do return 0
 
 		zoom := f32(lua.tonumber(L, 1))
 		camera.set_camera_zoom(zoom)

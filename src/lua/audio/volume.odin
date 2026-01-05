@@ -3,7 +3,6 @@ package audio
 import core "../../core"
 import lua_common "../lua_common"
 import "core:c"
-import "core:fmt"
 import lua "vendor:lua/5.4"
 
 GET_VOLUME_FUNCTION :: lua_common.LuaFunction {
@@ -11,17 +10,8 @@ GET_VOLUME_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		if lua.gettop(L) < 1 {
-			lua.pushstring(L, "get_volume expects at least 1 argument (number)")
-			lua.error(L)
-			return 0
-		}
-
-		if !lua.isnumber(L, 1) {
-			lua.pushstring(L, "First argument must be a number")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 1, "get_volume") do return 0
+		if !lua_common.validate_number(L, 1, "get_volume") do return 0
 
 		sound_id := lua.tonumber(L, 1)
 
@@ -36,17 +26,9 @@ SET_VOLUME_FUNCTION :: lua_common.LuaFunction {
 	func_ptr = proc "c" (L: ^lua.State) -> c.int {
 		context = core.DEFAULT_CONTEXT
 
-		if lua.gettop(L) < 2 {
-			lua.pushstring(L, "set_volume expects at least 2 argument (number, number)")
-			lua.error(L)
-			return 0
-		}
-
-		if !lua.isnumber(L, 1) || !lua.isnumber(L, 2) {
-			lua.pushstring(L, "Both argument must be a number")
-			lua.error(L)
-			return 0
-		}
+		if !lua_common.validate_arg_count(L, 2, "set_volume") do return 0
+		if !lua_common.validate_number(L, 1, "set_volume") do return 0
+		if !lua_common.validate_number(L, 2, "set_volume") do return 0
 
 		sound_id := lua.tonumber(L, 1)
 		volume := lua.tonumber(L, 2)
