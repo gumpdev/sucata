@@ -2,7 +2,6 @@ package core
 
 import sapp "../../sokol/app"
 import "../common"
-import "../fs"
 import "../graphics"
 import "base:runtime"
 import "core:sort"
@@ -38,6 +37,9 @@ load_scene :: proc(entities: [dynamic]^common.Entity) {
 }
 
 destroy :: proc(entity: ^common.Entity) {
+	if entity == nil {
+		return
+	}
 	for i := 0; i < len(scene); i += 1 {
 		if scene[i] == entity {
 			ordered_remove(&scene, i)
@@ -68,7 +70,7 @@ run_init :: proc() {
 		return
 	}
 	for &entity in scene {
-		if entity != nil {
+		if entity != nil && !entity.destroyed {
 			init(entity)
 		}
 	}
@@ -93,7 +95,7 @@ run_update :: proc() {
 			continue
 		}
 		entity := scene[i]
-		if entity != nil {
+		if entity != nil && !entity.destroyed && entity.initiated {
 			update(entity)
 		}
 	}
@@ -111,7 +113,7 @@ run_draw :: proc() {
 		return
 	}
 	for &entity in scene {
-		if entity != nil {
+		if entity != nil && !entity.destroyed && entity.initiated {
 			draw(entity)
 		}
 	}

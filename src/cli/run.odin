@@ -35,7 +35,7 @@ RUN_COMMAND :: CLICommand {
 				path.location.file,
 			)
 		} else {
-			fmt.println("Running Sucata project: ", path.location.file)
+			fmt.println("Running Sucata project:", path.location.file)
 		}
 
 		lua.init_lua(path.location.file, strings.trim_suffix(entity_file, ".lua"))

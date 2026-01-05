@@ -27,7 +27,7 @@ GC_Config :: struct {
 }
 
 default_gc_config := GC_Config {
-	pause    = 100,
+	pause    = 150,
 	step_mul = 150,
 	auto_gc  = true,
 }
@@ -50,33 +50,44 @@ load_file_as_cstring :: proc(path: string) -> (cstring, bool) {
 	if !ok {
 		return "", false
 	}
-	s := strings.clone_to_cstring(string(data))
+	temp := string(data)
+	s := strings.clone_to_cstring(temp)
 	delete(data)
 	return s, true
 }
 
 custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 	context = core.DEFAULT_CONTEXT
-	context.temp_allocator = core.temp_allocator
+
+	fmt.printfln("Custom loader called")
 
 	module_name := lua.tostring(L, 1)
 	if module_name == nil {
-		return 0
+		lua.pushstring(L, "module not found")
+		return 1
 	}
 
-	module_str := string(module_name)
+	fmt.printfln("Custom module name: %s", module_name)
+	module_str := strings.clone_from_cstring(module_name)
 	module_path, ok := strings.replace_all(module_str, ".", "/")
 	defer delete(module_path)
 
 	asset_patterns := []string {
-		strings.clone(fmt.tprintf("src://%s.lua", module_path)),
-		strings.clone(fmt.tprintf("src://%s/init.lua", module_path)),
-		strings.clone(fmt.tprintf("%s.lua", module_path)),
-		strings.clone(fmt.tprintf("%s/init.lua", module_path)),
+		fmt.aprintf("src://%s.lua", module_path),
+		fmt.aprintf("src://%s/init.lua", module_path),
+		fmt.aprintf("%s.lua", module_path),
+		fmt.aprintf("%s/init.lua", module_path),
+	}
+	defer {
+		for p in asset_patterns {
+			delete(p)
+		}
 	}
 
 	for pattern in asset_patterns {
+		fmt.printfln("Find pattern %s", pattern)
 		if asset_data, ok := fs.get_asset(pattern); ok && len(asset_data) > 0 {
+			fmt.printfln("Pattern %s found", pattern)
 			chunk_name := strings.clone_to_cstring(pattern)
 
 			result := lua.L_loadbuffer(L, raw_data(asset_data), len(asset_data), chunk_name)
@@ -84,13 +95,20 @@ custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 
 			if result == .OK {
 				return 1
+			} else {
+				lua.pop(L, 1)
 			}
 		}
 	}
 
 	fs_patterns := []string {
-		strings.clone(fmt.tprintf("%s.lua", module_path)),
-		strings.clone(fmt.tprintf("%s/init.lua", module_path)),
+		fmt.aprintf("%s.lua", module_path),
+		fmt.aprintf("%s/init.lua", module_path),
+	}
+	defer {
+		for p in fs_patterns {
+			delete(p)
+		}
 	}
 
 	for pattern in fs_patterns {
@@ -106,12 +124,14 @@ custom_loader :: proc "c" (L: ^lua.State) -> c.int {
 
 				if result == .OK {
 					return 1
+				} else {
+					lua.pop(L, 1)
 				}
 			}
 		}
 	}
 
-	return 0
+	return 1
 }
 
 close_lua :: proc() {
@@ -125,11 +145,10 @@ load_path :: proc() {
 	L := core.LUA_GLOBAL_STATE
 
 	lua.getglobal(L, "package")
+
 	lua.getfield(L, -1, "searchers")
-
 	lua.pushcfunction(L, custom_loader)
-	lua.rawseti(L, -2, 1)
-
+	lua.rawseti(L, -2, 2)
 	lua.pop(L, 1)
 
 	lua.getfield(L, -1, "path")
@@ -165,8 +184,6 @@ init_lua :: proc(path: string, entity_file: string = "") {
 	create_namespaces(L)
 	load_path()
 
-	fmt.println("Loading Lua script:", path)
-
 	code: cstring
 	ok: bool
 
@@ -177,6 +194,7 @@ init_lua :: proc(path: string, entity_file: string = "") {
 		)
 		ok = true
 		code = strings.clone_to_cstring(lua_code)
+		delete(lua_code)
 	} else if asset_data, found := fs.get_asset(path); found && len(asset_data) > 0 {
 		code = strings.clone_to_cstring(string(asset_data))
 		ok = true
@@ -191,8 +209,7 @@ init_lua :: proc(path: string, entity_file: string = "") {
 
 	code_str := string(code)
 	chunk_name := strings.clone_to_cstring(path)
-	defer delete(chunk_name)
-	defer delete(code)
+	defer delete_cstring(chunk_name)
 
 	if lua.L_loadbuffer(L, raw_data(code_str), len(code_str), chunk_name) != .OK {
 		err := lua.tostring(L, -1)
