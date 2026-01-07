@@ -39,7 +39,8 @@ OVERLAPPING_FUNCTION :: lua_common.LuaFunction {
 
 		if !overlapping {
 			lua.pushboolean(L, false)
-			return 1
+			lua.pushnil(L)
+			return 2
 		}
 
 		intersect_left := math.max(left1, left2)
