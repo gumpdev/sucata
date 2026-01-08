@@ -12,3 +12,4 @@ sokol/**/*.dylib
 sokol/**/*.a
 *.dSYM/**/*
 temp/*
+teste.*

@@ -10,62 +10,8 @@ import "core:strings"
 BUILD_HEADER :: "SUCATA_BUILD_"
 LUA_DLL_FILE_NAME :: "lua54.dll"
 
-get_executable_path :: proc() -> string {
-	arg0 := os.args[0]
-
-	if filepath.is_abs(arg0) {
-		return arg0
-	}
-
-	abs_path, ok := filepath.abs(arg0)
-	if ok && os.exists(abs_path) {
-		return abs_path
-	}
-
-	when ODIN_OS == .Windows {
-		if !filepath.is_abs(arg0) {
-			path_env := os.get_env("PATH")
-			defer delete(path_env)
-
-			paths := strings.split(path_env, ";")
-			defer delete(paths)
-
-			base_name := strings.trim_suffix(arg0, ".exe")
-
-			for dir_path in paths {
-				full_path_exe := filepath.join({dir_path, fmt.tprintf("{0}.exe", base_name)})
-				if os.exists(full_path_exe) {
-					return full_path_exe
-				}
-
-				full_path := filepath.join({dir_path, arg0})
-				if os.exists(full_path) {
-					return full_path
-				}
-			}
-		}
-	} else when ODIN_OS == .Darwin || ODIN_OS == .Linux || ODIN_OS == .FreeBSD {
-		if !filepath.is_abs(arg0) && !strings.contains(arg0, "/") {
-			path_env := os.get_env("PATH")
-			defer delete(path_env)
-
-			paths := strings.split(path_env, ":")
-			defer delete(paths)
-
-			for dir_path in paths {
-				full_path := filepath.join({dir_path, arg0})
-				if os.exists(full_path) {
-					return full_path
-				}
-			}
-		}
-	}
-
-	return arg0
-}
-
 clone_engine :: proc(output_dir: string, assets_hash: string, icon_path: string = "") {
-	engine_path := get_executable_path()
+	engine_path := path.get_executable_path()
 	fmt.println("Cloning engine from:", engine_path)
 
 	engine_data, read_ok := os.read_entire_file(engine_path)
@@ -104,7 +50,7 @@ clone_engine :: proc(output_dir: string, assets_hash: string, icon_path: string 
 }
 
 clone_lua_dll :: proc(output_dir: string) {
-	executable_path := get_executable_path()
+	executable_path := path.get_executable_path()
 	source_path := filepath.dir(executable_path)
 	lua_dll_path := filepath.join({source_path, LUA_DLL_FILE_NAME})
 

@@ -12,6 +12,7 @@ quad_shader: sg.Shader
 quad_pipeline: sg.Pipeline
 quad_sampler: sg.Sampler
 
+
 init_quad_indices :: proc() {
 	if quad_buffers_inited {
 		return
