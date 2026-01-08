@@ -15,7 +15,7 @@ for d in ./src/shaders/*/; do
     
     echo "Compilando shader: $shader_name"
 
-    ./sokol-shdc/sokol-shdc-macos -i "$d$shader_name.glsl" -o "$d$shader_name.odin" -l glsl430:hlsl5:metal_macos:wgsl -f sokol_odin
+    ./sokol-shdc/sokol-shdc-mac-arm -i "$d$shader_name.glsl" -o "$d$shader_name.odin" -l glsl430:hlsl5:metal_macos:wgsl -f sokol_odin
 
     echo ""
 done

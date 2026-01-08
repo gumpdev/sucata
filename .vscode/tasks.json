@@ -43,13 +43,13 @@
 			"label": "Build Shaders",
 			"type": "shell",
 			"windows": {
-				"command": "./sokol-shdc/build-shaders-win.cmd"
+				"command": "./scripts/build-shaders-win.cmd"
 			},
 			"osx": {
-				"command": "./sokol-shdc/build-shaders-macos.sh"
+				"command": "./scripts/build-shaders-macos.sh"
 			},
 			"linux": {
-				"command": "./sokol-shdc/build-shaders-macos.sh"
+				"command": "./scripts/build-shaders-macos.sh"
 			},
 			"options": {
 				"cwd": "${workspaceFolder}"

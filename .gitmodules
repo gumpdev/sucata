@@ -1,0 +1,3 @@
+[submodule "sokol"]
+	path = shared/sokol
+	url = https://github.com/floooh/sokol.git

@@ -11,3 +11,4 @@ sokol/**/*.so
 sokol/**/*.dylib
 sokol/**/*.a
 *.dSYM/**/*
+temp/*
