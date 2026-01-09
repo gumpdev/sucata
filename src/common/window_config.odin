@@ -10,4 +10,5 @@ WindowConfig :: struct {
 	visible_mouse:   bool,
 	draw_debug_info: bool,
 	keep_aspect:     i32,
+	icon:            string,
 }

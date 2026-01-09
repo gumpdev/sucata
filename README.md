@@ -64,8 +64,7 @@ The goal is to make a create game experience similar good and smooth using only 
 	 ```bash
 	 git clone https://github.com/gumpdev/sucata.git
 	 ```
-3. [Build the sokol binaries](github.com/floooh/sokol-odin?tab=readme-ov-file#build) on the `/sokol/` folder.
-4. Run installer script:
+3. Run installer script:
 	 ### For Linux and macOS
 	 ```bash
 	 cd sucata; ./install_unix.sh
@@ -74,8 +73,8 @@ The goal is to make a create game experience similar good and smooth using only 
 	 ```powershell
 	 cd sucata; ./install_windows.cmd
 	 ```
-5. Restart your terminal, then sucata command will be available
-6. Install the [Sucata Lua addon](https://github.com/gumpdev/sucata-lua-addon) on [Lua Sumneko extension](https://luals.github.io/#vscode-install) for better Sucata autocompletion on IDE 
+4. Restart your terminal, then sucata command will be available
+5. Install the [Sucata Lua addon](https://github.com/gumpdev/sucata-lua-addon) on [Lua Sumneko extension](https://luals.github.io/#vscode-install) for better Sucata autocompletion on IDE 
 
 <br>
 <a id="getting-started"></a>

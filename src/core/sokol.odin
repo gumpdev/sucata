@@ -7,6 +7,7 @@ import shelpers "../../sokol/helpers"
 import st "../../sokol/time"
 import "../fs"
 import "../graphics"
+import "../path"
 import "base:runtime"
 import "core:fmt"
 import "core:strings"
@@ -57,6 +58,9 @@ init_sokol :: proc() {
 	window_title := strings.clone_to_cstring(windowConfig.title)
 	defer delete(window_title)
 
+	icon_desc := load_window_icon(windowConfig.icon)
+	defer free_icon_desc(&icon_desc)
+
 	sapp.run(
 		{
 			width = windowConfig.width,
@@ -66,6 +70,7 @@ init_sokol :: proc() {
 			logger = sapp.Logger(shelpers.logger(&DEFAULT_CONTEXT)),
 			swap_interval = windowConfig.vsync,
 			fullscreen = windowConfig.fullscreen,
+			icon = icon_desc,
 			init_cb = init_callback,
 			frame_cb = frame_callback,
 			cleanup_cb = cleanup_callback,
@@ -95,6 +100,8 @@ init_callback :: proc "c" () {
 		fmt.printfln("Failed to initialize audio engine")
 	}
 
+	init_gamepad()
+
 	is_game_started = true
 	if scene != nil && len(scene) > 0 {
 		run_init()
@@ -109,6 +116,7 @@ cleanup_callback :: proc "c" () {
 	cleanup_tags()
 	cleanup_timers()
 	cleanup_entities()
+	shutdown_gamepad()
 	audio_shutdown()
 	graphics.shutdown_graphics()
 
@@ -139,6 +147,9 @@ frame_callback :: proc "c" () {
 	calc_time()
 	update_timers(delta_time)
 	audio_update()
+
+	poll_gamepad_events()
+
 	run_update()
 	process_hoverables()
 
@@ -173,6 +184,7 @@ frame_callback :: proc "c" () {
 	elapsed_time = 0.0
 
 	clear_input()
+	clear_gamepad_states()
 	process_destroy_queue()
 
 	if LUA_GLOBAL_STATE != nil {

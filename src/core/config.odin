@@ -15,6 +15,7 @@ windowConfig := common.WindowConfig {
 	visible_mouse   = true,
 	draw_debug_info = false,
 	keep_aspect     = 0,
+	icon            = "",
 }
 
 set_mouse_lock :: proc(mouse_lock: b32) {

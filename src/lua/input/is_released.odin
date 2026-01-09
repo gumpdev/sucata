@@ -3,7 +3,6 @@ package input
 import core "../../core"
 import lua_common "../lua_common"
 import "core:c"
-import "core:strings"
 import lua "vendor:lua/5.4"
 
 IS_RELEASED_FUNCTION :: lua_common.LuaFunction {
