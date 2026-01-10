@@ -22,6 +22,7 @@ if not exist "%INSTALL_DIR%" (
 echo Copying files...
 copy /Y "sucata.exe" "%INSTALL_DIR%" >nul
 copy /Y "lua54.dll" "%INSTALL_DIR%" >nul
+copy /Y "SDL3.dll" "%INSTALL_DIR%" >nul
 
 if errorlevel 1 (
     echo ERROR copying sucata.exe or lua54.dll. Make sure they are in the same folder as install-windows.cmd.

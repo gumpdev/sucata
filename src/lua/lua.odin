@@ -14,6 +14,7 @@ import "core:fmt"
 import "core:os"
 import "core:strings"
 import "events"
+import "gamepad"
 import "graphic"
 import "input"
 import lua_common "lua_common"
@@ -36,6 +37,7 @@ lua_namespaces :: []lua_common.LuaNamespace {
 	audio.AUDIO_NAMESPACE,
 	cam.CAMERA_NAMESPACE,
 	file_system.FILE_SYSTEM_NAMESPACE,
+	gamepad.GAMEPAD_NAMESPACE,
 	graphic.GRAPHIC_NAMESPACE,
 	scene.SCENE_NAMESPACE,
 	timens.TIME_NAMESPACE,

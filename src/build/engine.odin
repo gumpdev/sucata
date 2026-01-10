@@ -9,6 +9,7 @@ import "core:strings"
 
 BUILD_HEADER :: "SUCATA_BUILD_"
 LUA_DLL_FILE_NAME :: "lua54.dll"
+SDL_DLL_FILE_NAME :: "SDL3.dll"
 
 clone_engine :: proc(output_dir: string, assets_hash: string, icon_path: string = "") {
 	engine_path := path.get_executable_path()
@@ -37,6 +38,7 @@ clone_engine :: proc(output_dir: string, assets_hash: string, icon_path: string 
 	if path.location.system == "windows" {
 		remove_console_window(output_path)
 		clone_lua_dll(output_dir)
+		clone_sdl_dll(output_dir)
 		if icon_path != "" {
 			embed_windows_icon(output_path, icon_path)
 		}
@@ -63,6 +65,22 @@ clone_lua_dll :: proc(output_dir: string) {
 	defer os.close(output_handle)
 
 	os.write(output_handle, lua_dll_data)
+}
+
+clone_sdl_dll :: proc(output_dir: string) {
+	executable_path := path.get_executable_path()
+	source_path := filepath.dir(executable_path)
+	sdl_dll_path := filepath.join({source_path, SDL_DLL_FILE_NAME})
+
+	sdl_dll_data, read_ok := os.read_entire_file(sdl_dll_path)
+	defer delete(sdl_dll_data)
+
+	output_path := filepath.join({output_dir, SDL_DLL_FILE_NAME})
+
+	output_handle, open_err := os.open(output_path, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0o755)
+	defer os.close(output_handle)
+
+	os.write(output_handle, sdl_dll_data)
 }
 
 write_build_header :: proc(output_handle: os.Handle, assets_hash: string) {

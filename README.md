@@ -277,7 +277,7 @@ sucata build .
 
 > The project assets will be bundle to `assets.sucata` file inside the build folder.
 
-> Windows builds needs the `lua54.dll` file to run the project
+> Windows builds needs the `lua54.dll` and `SDL3.dll` file to run the project
 
 <br>
 <a id="examples"></a>

@@ -3,8 +3,9 @@ package cli
 import "core:fmt"
 import "core:os"
 
-VERSION :: "0.0.1"
-RELEASED_ON :: "2025-12"
+VERSION :: "0.1.0"
+VERSION_TYPE :: "stable"
+RELEASED_ON :: "2026-01"
 CLI_COMMANDS :: []CLICommand{RUN_COMMAND, BUILD_COMMAND, VERSION_COMMAND, SHADER_COMMAND}
 
 main :: proc() {
@@ -33,7 +34,7 @@ main :: proc() {
 }
 
 welcome_message :: proc() {
-	fmt.println("Sucata Game Engine")
+	fmt.printfln("Sucata Game Engine - %s-%s", VERSION, VERSION_TYPE)
 }
 
 help :: proc() {

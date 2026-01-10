@@ -16,19 +16,19 @@ GamepadState :: struct {
 	connected:    bool,
 }
 
-MAX_GAMEPADS :: 4
+MAX_GAMEPADS :: 8
 gamepads: [MAX_GAMEPADS]GamepadState
 
 init_gamepad :: proc() {
 	if !sdl3.InitSubSystem({.GAMEPAD}) {
-		fmt.eprintln("Falha ao inicializar SDL3 Gamepad:", sdl3.GetError())
+		fmt.eprintln("Error in SDL3 Gamepad:", sdl3.GetError())
 		return
 	}
 
 	joystick_count: c.int
 	joystick_ids := sdl3.GetJoysticks(&joystick_count)
 	if joystick_ids == nil {
-		fmt.eprintln("Erro ao obter joysticks:", sdl3.GetError())
+		fmt.eprintln("Error to get joysticks:", sdl3.GetError())
 		return
 	}
 	defer sdl3.free(joystick_ids)
@@ -50,13 +50,12 @@ add_gamepad :: proc(joystick_id: sdl3.JoystickID) -> bool {
 	}
 
 	if slot == -1 {
-		fmt.eprintln("Máximo de gamepads atingido")
 		return false
 	}
 
 	gamepad := sdl3.OpenGamepad(joystick_id)
 	if gamepad == nil {
-		fmt.eprintln("Falha ao abrir gamepad:", sdl3.GetError())
+		fmt.eprintln("Failed to run the gamepad:", sdl3.GetError())
 		return false
 	}
 
@@ -71,7 +70,6 @@ add_gamepad :: proc(joystick_id: sdl3.JoystickID) -> bool {
 		gamepads[slot].axes[axis] = 0.0
 	}
 
-	fmt.printfln("Gamepad conectado no slot %d: %s", slot, gamepads[slot].name)
 	return true
 }
 
@@ -82,10 +80,19 @@ remove_gamepad :: proc(id: sdl3.JoystickID) {
 				sdl3.CloseGamepad(gamepads[i].gamepad)
 			}
 			gamepads[i] = {}
-			fmt.printfln("Gamepad desconectado do slot %d", i)
 			break
 		}
 	}
+}
+
+get_gamepad_count :: proc() -> int {
+	count := 0
+	for i in 0 ..< MAX_GAMEPADS {
+		if gamepads[i].connected {
+			count += 1
+		}
+	}
+	return count
 }
 
 clear_gamepad_states :: proc() {
@@ -171,44 +178,105 @@ gamepad_get_name :: proc(slot: int) -> string {
 	return gamepads[slot].name
 }
 
-gamepad_button_down :: proc(slot: int, button: sdl3.GamepadButton) -> bool {
-	if slot < 0 || slot >= MAX_GAMEPADS || !gamepads[slot].connected {
-		return false
+gamepad_button_down :: proc(button_str: string, slot: int = -1) -> (bool, int) {
+	button := string_to_gamepad_button(button_str)
+	if slot >= 0 {
+		if slot < 0 || slot >= MAX_GAMEPADS || !gamepads[slot].connected {
+			return false, -1
+		}
+		return gamepads[slot].buttons[button], slot
 	}
-	return gamepads[slot].buttons[button]
-}
 
-gamepad_button_pressed :: proc(slot: int, button: sdl3.GamepadButton) -> bool {
-	if slot < 0 || slot >= MAX_GAMEPADS || !gamepads[slot].connected {
-		return false
+	for i in 0 ..< MAX_GAMEPADS {
+		if !gamepads[i].connected {
+			continue
+		}
+		if gamepads[i].buttons[button] {
+			return true, i
+		}
 	}
-	return gamepads[slot].buttons_down[button]
+	return false, -1
 }
 
-gamepad_button_released :: proc(slot: int, button: sdl3.GamepadButton) -> bool {
-	if slot < 0 || slot >= MAX_GAMEPADS || !gamepads[slot].connected {
-		return false
+gamepad_button_pressed :: proc(button_str: string, slot: int = -1) -> (bool, int) {
+	button := string_to_gamepad_button(button_str)
+	if slot >= 0 {
+		if slot < 0 || slot >= MAX_GAMEPADS || !gamepads[slot].connected {
+			return false, -1
+		}
+		return gamepads[slot].buttons_down[button], slot
 	}
-	return gamepads[slot].buttons_up[button]
-}
 
-gamepad_axis :: proc(slot: int, axis: sdl3.GamepadAxis) -> f32 {
-	if slot < 0 || slot >= MAX_GAMEPADS || !gamepads[slot].connected {
-		return 0.0
+	for i in 0 ..< MAX_GAMEPADS {
+		if !gamepads[i].connected {
+			continue
+		}
+		if gamepads[i].buttons_down[button] {
+			return true, i
+		}
 	}
-	return gamepads[slot].axes[axis]
+	return false, -1
 }
 
-gamepad_left_stick :: proc(slot: int) -> [2]f32 {
-	return {gamepad_axis(slot, .LEFTX), gamepad_axis(slot, .LEFTY)}
+gamepad_button_released :: proc(button_str: string, slot: int = -1) -> (bool, int) {
+	button := string_to_gamepad_button(button_str)
+	if slot >= 0 {
+		if slot < 0 || slot >= MAX_GAMEPADS || !gamepads[slot].connected {
+			return false, -1
+		}
+		return gamepads[slot].buttons_up[button], slot
+	}
+
+	for i in 0 ..< MAX_GAMEPADS {
+		if !gamepads[i].connected {
+			continue
+		}
+		if gamepads[i].buttons_up[button] {
+			return true, i
+		}
+	}
+	return false, -1
 }
 
-gamepad_right_stick :: proc(slot: int) -> [2]f32 {
-	return {gamepad_axis(slot, .RIGHTX), gamepad_axis(slot, .RIGHTY)}
+gamepad_axis :: proc(axis_str: string, slot: int = -1) -> (f32, int) {
+	axis := string_to_gamepad_axis(axis_str)
+
+	if slot >= 0 {
+		if slot < 0 || slot >= MAX_GAMEPADS || !gamepads[slot].connected {
+			return 0.0, slot
+		}
+		return gamepads[slot].axes[axis], slot
+	}
+	for i in 0 ..< MAX_GAMEPADS {
+		if !gamepads[i].connected {
+			continue
+		}
+		if gamepads[i].axes[axis] != 0.0 {
+			return gamepads[i].axes[axis], i
+		}
+	}
+	return 0.0, -1
 }
 
-gamepad_triggers :: proc(slot: int) -> [2]f32 {
-	return {gamepad_axis(slot, .LEFT_TRIGGER), gamepad_axis(slot, .RIGHT_TRIGGER)}
+string_to_gamepad_axis :: proc(s: string) -> sdl3.GamepadAxis {
+	sv := strings.to_lower(s)
+	defer delete(sv)
+
+	switch sv {
+	case "left_x":
+		return .LEFTX
+	case "left_y":
+		return .LEFTY
+	case "right_x":
+		return .RIGHTX
+	case "right_y":
+		return .RIGHTY
+	case "trigger_left":
+		return .LEFT_TRIGGER
+	case "trigger_right":
+		return .RIGHT_TRIGGER
+	}
+	return .INVALID
 }
 
 string_to_gamepad_button :: proc(s: string) -> sdl3.GamepadButton {
