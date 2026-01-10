@@ -56,6 +56,9 @@ free_icon_desc :: proc(icon_desc: ^sapp.Icon_Desc) {
 }
 
 set_window_icon :: proc(icon_path: string) {
+	if windowConfig.icon != "" {
+		delete(windowConfig.icon)
+	}
 	windowConfig.icon = strings.clone(icon_path)
 
 	if !sapp.isvalid() {
@@ -65,7 +68,6 @@ set_window_icon :: proc(icon_path: string) {
 	icon_desc := sapp.Icon_Desc{}
 
 	if icon_path == "" {
-		icon_desc.sokol_default = true
 		sapp.set_icon(icon_desc)
 		return
 	}
@@ -82,7 +84,7 @@ set_window_icon :: proc(icon_path: string) {
 	}
 
 	if pixels == nil {
-		fmt.printfln("Falha ao carregar ícone: %s", icon_path)
+		fmt.printfln("Failed to load the icon: %s", icon_path)
 		return
 	}
 

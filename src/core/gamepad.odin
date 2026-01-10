@@ -53,6 +53,10 @@ add_gamepad :: proc(joystick_id: sdl3.JoystickID) -> bool {
 		return false
 	}
 
+	if gamepads[slot].name != "" {
+		delete(gamepads[slot].name)
+	}
+
 	gamepad := sdl3.OpenGamepad(joystick_id)
 	if gamepad == nil {
 		fmt.eprintln("Failed to run the gamepad:", sdl3.GetError())
@@ -79,6 +83,7 @@ remove_gamepad :: proc(id: sdl3.JoystickID) {
 			if gamepads[i].gamepad != nil {
 				sdl3.CloseGamepad(gamepads[i].gamepad)
 			}
+			delete(gamepads[i].name)
 			gamepads[i] = {}
 			break
 		}
@@ -160,6 +165,10 @@ shutdown_gamepad :: proc() {
 		if gamepads[i].connected && gamepads[i].gamepad != nil {
 			sdl3.CloseGamepad(gamepads[i].gamepad)
 		}
+		if gamepads[i].connected {
+			delete(gamepads[i].name)
+		}
+		gamepads[i] = {}
 	}
 	sdl3.QuitSubSystem({.GAMEPAD})
 }

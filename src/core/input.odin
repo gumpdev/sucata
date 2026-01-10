@@ -2,7 +2,6 @@ package core
 
 import sapp "../../sokol/app"
 import "core:strings"
-import "vendor:sdl3"
 
 InputState :: struct {
 	keys_down:     [512]bool,
