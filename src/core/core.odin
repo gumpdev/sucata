@@ -224,15 +224,6 @@ process_destroy_queue :: proc() {
 }
 
 clear_render_queue :: proc() {
-	for v in renderQueue {
-		switch obj in v {
-		case common.TextObjectProps:
-			delete(obj.text)
-			delete(obj.font)
-		case common.QuadObjectProps:
-			delete(obj.texture)
-		}
-	}
 	clear(&renderQueue)
 }
 

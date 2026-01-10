@@ -81,8 +81,6 @@ update_timers :: proc(delta_time: f64) {
 	for id in timers_to_stop {
 		stop_timer(id)
 	}
-
-	delete(timers_to_stop)
 }
 
 cleanup_timers :: proc() {
