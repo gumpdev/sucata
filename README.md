@@ -13,6 +13,7 @@ An open-source 2D game engine made with Odin programming language and Lua as scr
 - Render images and texts with GPU acceleration (using native libraries like D11X, Metal, OpenGL)
 - Audio playback and manipulation
 - Input handling (keyboard, mouse)
+- Gamepad support
 - Scene management
 - Lua scripting
 - Cross-platform support (Windows, macOS, Linux)
@@ -26,7 +27,6 @@ An open-source 2D game engine made with Odin programming language and Lua as scr
 - Multiple Shader support
 - Network multiplayer support
 - Particle system
-- Controller support
 - Maybe 3D support in the future
 - Support with [Tiled](https://www.mapeditor.org)
 - Native call support for C/C++ functions
