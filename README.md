@@ -2,11 +2,7 @@
 
 An open-source 2D game engine made with Odin programming language and Lua as scripting language, inspired by Love2D and Godot Engine.
 
-<br>
-
 [Website/Documentation](https://sucata.dev) | [Discord](https://discord.com/invite/Rv9EavmaJQ)
-
-<br>
 
 ### ✨ Features ✨
 
@@ -32,7 +28,6 @@ An open-source 2D game engine made with Odin programming language and Lua as scr
 - Native call support for C/C++ functions
 
 
-<br>
 <br>
 
 ## Table of Contents
@@ -74,7 +69,12 @@ The goal is to make a create game experience similar good and smooth using only 
 	 cd sucata; ./install_windows.cmd
 	 ```
 4. Restart your terminal, then sucata command will be available
-5. Install the [Sucata Lua addon](https://github.com/gumpdev/sucata-lua-addon) on [Lua Sumneko extension](https://luals.github.io/#vscode-install) for better Sucata autocompletion on IDE 
+
+### Installing the Sucata Addon
+1. Install the [sumneko lua extension](https://luals.github.io/) on your favorite IDE
+2. Open the Addon Manager
+3. Search for 'sucata' and install
+> You can see the manual instalation [here](https://github.com/gumpdev/sucata-lua-addon)
 
 <br>
 <a id="getting-started"></a>
