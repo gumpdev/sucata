@@ -31,6 +31,7 @@ TEXT_FUNCTION :: lua_common.LuaFunction {
 		fixed := lua_common.get_table_boolean(L, 1, "fixed", false)
 		align := lua_common.get_table_string(L, 1, "align", "left")
 		max_width := f32(lua_common.get_table_number(L, 1, "max_width", 0.0))
+		opacity := lua_common.get_table_number_nil(L, 1, "opacity")
 
 		if scale != 1.0 && (scale_x == 1.0 && scale_y == 1.0) {
 			scale_x = scale
@@ -61,6 +62,7 @@ TEXT_FUNCTION :: lua_common.LuaFunction {
 			scale    = [2]f32{scale_x, scale_y},
 			origin   = [2]f32{origin_x, origin_y},
 			rotation = rotation,
+			opacity  = opacity,
 			text     = text,
 			fixed    = fixed,
 			align    = text_align,

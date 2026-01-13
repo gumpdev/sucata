@@ -36,6 +36,20 @@ get_table_number :: proc(
 	return result
 }
 
+get_table_number_nil :: proc(L: ^lua.State, table_index: c.int, field: cstring) -> Maybe(f32) {
+	lua.pushstring(L, field)
+	lua.gettable(L, table_index)
+
+	if lua.isnumber(L, -1) {
+		result := f32(lua.tonumber(L, -1))
+		lua.pop(L, 1)
+		return result
+	}
+
+	lua.pop(L, 1)
+	return nil
+}
+
 get_table_string :: proc(
 	L: ^lua.State,
 	table_index: c.int,

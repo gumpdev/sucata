@@ -220,6 +220,9 @@ text :: proc(props: common.TextObjectProps) {
 	line_height := font_size * scale[1]
 	current_y := position[1]
 
+	opacity := props.opacity.(f32) or_else color[3]
+	text_color := Vec4{color[0], color[1], color[2], opacity}
+
 	for line in lines {
 		if len(line) == 0 {
 			current_y += line_height
@@ -253,7 +256,6 @@ text :: proc(props: common.TextObjectProps) {
 
 			points := to_world_space_2d(char_pos, char_size, scale, origin, rotation)
 
-			text_color := Vec4{color[0], color[1], color[2], color[3]}
 			uv_pos := to_uv_space_2d(
 				f32(baked_char.x0),
 				f32(baked_char.y0),

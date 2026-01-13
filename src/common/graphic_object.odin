@@ -24,6 +24,7 @@ QuadObjectProps :: struct {
 	scale:    [2]f32,
 	origin:   [2]f32,
 	rotation: f32,
+	opacity:  Maybe(f32),
 	fixed:    bool,
 	atlas:    AtlasProps,
 }
@@ -39,6 +40,7 @@ TextObjectProps :: struct {
 	origin:   [2]f32,
 	fixed:    bool,
 	rotation: f32,
+	opacity:  Maybe(f32),
 	align:    TextAlign,
 	maxWidth: f32,
 }

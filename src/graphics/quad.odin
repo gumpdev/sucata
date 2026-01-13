@@ -97,7 +97,8 @@ quad :: proc(props: common.QuadObjectProps) {
 
 	points := to_world_space_2d(position, size, scale, origin, rotation)
 
-	quad_color := Vec4{color[0], color[1], color[2], color[3]}
+	opacity := props.opacity.(f32) or_else color[3]
+	quad_color := Vec4{color[0], color[1], color[2], opacity}
 	uv_pos := calculate_atlas_uv(atlas, f32(image.width), f32(image.height))
 
 	vertices: [4]Vertex_Data
