@@ -3,6 +3,7 @@ package fs
 import fpath "../path"
 import "core:os"
 import "core:path/filepath"
+import "core:strings"
 
 read_file :: proc(file_path: string) -> ([]u8, bool) {
 	if asset, asset_ok := get_asset(file_path); asset_ok {
@@ -23,7 +24,7 @@ read_file_as_string :: proc(file_path: string) -> (string, bool) {
 		return "", false
 	}
 
-	return string(data), true
+	return strings.clone_from(data), true
 }
 
 read_dir :: proc(dir_path: string) -> ([]string, bool) {

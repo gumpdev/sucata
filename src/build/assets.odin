@@ -1,6 +1,7 @@
 package build
 
 import "../common"
+import ph "../path"
 import "core:bytes"
 import "core:crypto/hash"
 import "core:encoding/hex"
@@ -10,13 +11,17 @@ import "core:mem"
 import "core:os"
 import "core:path/filepath"
 import "core:strings"
+import "core:text/regex"
 import "vendor:compress/lz4"
+
+LUA_REQUIRE_REGEX :: `require\s*\(\s*["']([^"']+)["']\s*\)`
+FILES_REGEX :: `["']((?:src)://[^"']+)["']`
 
 generate_assets :: proc(src_path: string, main_file: string, output_path: string) -> string {
 	files := make([dynamic]string)
 	defer delete(files)
 
-	collect_files(src_path, &files)
+	collect_paths(main_file, &files)
 
 	fmt.println("Found", len(files), "files to package. src:", src_path)
 
@@ -30,18 +35,13 @@ generate_assets :: proc(src_path: string, main_file: string, output_path: string
 	total_size := 0
 
 	for file in files {
-		if strings.has_suffix(file, ".exe") {
-			continue
-		}
-		if strings.has_suffix(file, ".dll") {
-			continue
-		}
-		if strings.has_suffix(file, ".scta") {
-			continue
-		}
-
 		data, read_ok := os.read_entire_file(file)
 		defer delete(data)
+
+		if !read_ok {
+			fmt.printfln("Warning: File %s was not found!", file)
+			continue
+		}
 
 		rel_path, rel_err := filepath.rel(src_path, file)
 		if rel_err != nil {
@@ -118,34 +118,57 @@ get_assets_hash :: proc(assets_path: string) -> string {
 	return string(hash_string)
 }
 
-collect_files :: proc(dir_path: string, files: ^[dynamic]string) -> os.Errno {
-	if (strings.has_suffix(dir_path, ".git") ||
-		   strings.has_suffix(dir_path, "node_modules") ||
-		   strings.has_suffix(dir_path, "build")) {
+lua_path_to_dir_path :: proc(req: string) -> string {
+	base_dir := ph.location.src
+	path, ok := strings.replace_all(req, ".", "/")
+
+	init_lua := fmt.tprintf("%s/%s/init.lua", base_dir, path)
+	if os.exists(init_lua) {
+		return init_lua
+	}
+
+	return fmt.tprintf("%s/%s.lua", base_dir, path)
+}
+
+contains_file :: proc(path: string, files: ^[dynamic]string) -> bool {
+	for file in files {
+		if strings.equal_fold(path, file) {
+			return true
+		}
+	}
+	return false
+}
+
+collect_paths :: proc(file_path: string, files: ^[dynamic]string) -> os.Errno {
+	file_content, ok := os.read_entire_file(file_path)
+	if !ok {
 		return os.ERROR_NONE
 	}
-	dir_handle, open_err := os.open(dir_path, os.O_RDONLY, 0)
-	if open_err != os.ERROR_NONE {
-		return open_err
+
+	if !contains_file(file_path, files) {
+		append(files, file_path)
 	}
-	defer os.close(dir_handle)
 
-	file_infos, read_err := os.read_dir(dir_handle, -1)
-	if read_err != os.ERROR_NONE {
-		return read_err
-	}
-	defer os.file_info_slice_delete(file_infos)
+	content := string(file_content)
 
-	for info in file_infos {
-		full_path := filepath.join({dir_path, info.name})
-		defer delete(full_path)
-
-		if info.is_dir {
-			if err := collect_files(full_path, files); err != os.ERROR_NONE {
-				return err
+	interator_files, err := regex.create_iterator(content, FILES_REGEX)
+	if err == nil {
+		for match in regex.match_iterator(&interator_files) {
+			match_path := ph.get_path(match.groups[1])
+			if !contains_file(match_path, files) {
+				append(files, match_path)
 			}
-		} else {
-			append(files, filepath.clean(full_path))
+		}
+	}
+
+	interator_lua, err_lua := regex.create_iterator(content, LUA_REQUIRE_REGEX)
+	if err_lua == nil {
+		for match in regex.match_iterator(&interator_lua) {
+			match_path := lua_path_to_dir_path(match.groups[1])
+			err_collect_paths := collect_paths(match_path, files)
+			if err_collect_paths != os.ERROR_NONE {
+				return err_collect_paths
+			}
 		}
 	}
 

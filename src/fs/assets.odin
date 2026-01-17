@@ -37,21 +37,84 @@ load_assets :: proc(asset_path: string, allocator := context.allocator) -> bool 
 		return false
 	}
 
+	assets = new(common.Asset_Archive)
+	assets.entries = entries
+	assets.path = asset_path
+
+	return true
+}
+
+get_entry :: proc(path: string) -> ^common.Asset_Entry {
+	if assets == nil {
+		return nil
+	}
+	for &entry in assets.entries {
+		if strings.equal_fold(entry.path, path) {
+			return &entry
+		}
+	}
+	return nil
+}
+
+unload_asset :: proc(file_path: string, allocator := context.allocator) {
+	if assets == nil {
+		return
+	}
+
+	clean_path := file_path
+	if strings.has_prefix(file_path, "src://") {
+		clean_path = file_path[6:]
+	}
+
+	entry := get_entry(clean_path)
+	if entry == nil {
+		return
+	}
+	delete(entry.cache)
+}
+
+load_asset :: proc(path: string, allocator := context.allocator) -> (data: []byte, ok: bool) {
+	if assets == nil {
+		return nil, false
+	}
+
+	entry := get_entry(path)
+	if entry == nil {
+		return nil, false
+	}
+
+	if entry.cache != nil {
+		return entry.cache, true
+	}
+
+	file_data, read_ok := os.read_entire_file(assets.path)
+	if !read_ok {
+		return nil, false
+	}
+	defer delete(file_data)
+
+	if len(file_data) < 8 {
+		return nil, false
+	}
+
+	header_size := (^u64)(raw_data(file_data))^
+
+	if header_size == 0 || int(header_size) > len(file_data) - 8 {
+		return nil, false
+	}
+
+	json_start := 8
+	json_end := json_start + int(header_size)
 	compressed_data := file_data[json_end:]
 
 	total_uncompressed_size := 0
-	if len(entries) > 0 {
-		last_entry := entries[len(entries) - 1]
+	if len(assets.entries) > 0 {
+		last_entry := assets.entries[len(assets.entries) - 1]
 		total_uncompressed_size = last_entry.offset + last_entry.size
 	}
 
-	if total_uncompressed_size <= 0 || total_uncompressed_size > 1024 * 1024 * 1024 {
-		delete(entries)
-		return false
-	}
-
 	decompressed_buffer := make([]byte, total_uncompressed_size, allocator)
-
+	defer delete(decompressed_buffer)
 	decompressed_size := lz4.decompress_safe(
 		raw_data(compressed_data),
 		raw_data(decompressed_buffer),
@@ -59,48 +122,37 @@ load_assets :: proc(asset_path: string, allocator := context.allocator) -> bool 
 		cast(i32)total_uncompressed_size,
 	)
 
-	if decompressed_size != cast(i32)total_uncompressed_size {
-		delete(entries)
-		delete(decompressed_buffer)
-		return false
-	}
+	decompressed_data := decompressed_buffer[entry.offset:entry.offset + entry.size]
+	entry_data := make([]byte, len(decompressed_data))
+	copy(entry_data, decompressed_data)
 
-	assets = new(common.Asset_Archive)
-	assets.entries = entries
-	assets.decompressed_data = decompressed_buffer
+	entry.cache = entry_data
 
-	return true
+	return entry_data, true
 }
 
 unload_assets :: proc(allocator := context.allocator) {
 	context.allocator = allocator
 	if assets != nil {
 		delete(assets.entries)
-		delete(assets.decompressed_data)
 		free(assets)
 		assets = nil
 	}
 }
 
-get_asset :: proc(path: string, allocator := context.allocator) -> (data: []byte, ok: bool) {
+get_asset :: proc(file_path: string, allocator := context.allocator) -> (data: []byte, ok: bool) {
 	context.allocator = allocator
 	if assets == nil {
 		return nil, false
 	}
 
-	clean_path := path
-	if strings.has_prefix(path, "src://") {
-		clean_path = path[6:]
+	clean_path := file_path
+	if strings.has_prefix(file_path, "src://") {
+		clean_path = file_path[6:]
 	}
 
-	for entry in assets.entries {
-		if entry.path == clean_path || entry.path == path {
-			start := entry.offset
-			end := entry.offset + entry.size
-			return assets.decompressed_data[start:end], true
-		}
-	}
-	return nil, false
+	vlr, vlr_ok := load_asset(clean_path, allocator)
+	return vlr, vlr_ok
 }
 
 list_assets :: proc(allocator := context.allocator) -> []string {
