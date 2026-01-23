@@ -3,7 +3,7 @@ package cli
 import "core:fmt"
 import "core:os"
 
-VERSION :: "0.1.0"
+VERSION :: "0.1.1"
 VERSION_TYPE :: "stable"
 RELEASED_ON :: "2026-01"
 CLI_COMMANDS :: []CLICommand{RUN_COMMAND, BUILD_COMMAND, VERSION_COMMAND, SHADER_COMMAND}

@@ -120,10 +120,7 @@ cleanup_callback :: proc "c" () {
 	audio_shutdown()
 	graphics.shutdown_graphics()
 
-	delete(windowConfig.title)
-
 	sg.shutdown()
-	cleanup_temp_arena()
 
 	if is_build_mode {
 		fs.unload_assets()
@@ -133,6 +130,7 @@ cleanup_callback :: proc "c" () {
 		lua.close(LUA_GLOBAL_STATE)
 		LUA_GLOBAL_STATE = nil
 	}
+	cleanup_temp_arena()
 }
 
 elapsed_time := 0.0

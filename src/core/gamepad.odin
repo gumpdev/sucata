@@ -17,6 +17,7 @@ GamepadState :: struct {
 }
 
 MAX_GAMEPADS :: 8
+GAMEPAD_DEADZONE :: 0.15
 gamepads: [MAX_GAMEPADS]GamepadState
 
 init_gamepad :: proc() {
@@ -146,6 +147,11 @@ handle_gamepad_event :: proc(event: ^sdl3.Event) {
 			if gamepads[i].connected && gamepads[i].id == event.gaxis.which {
 				axis := sdl3.GamepadAxis(event.gaxis.axis)
 				value := f32(event.gaxis.value) / 32767.0
+
+				if abs(value) < GAMEPAD_DEADZONE {
+					value = 0.0
+				}
+
 				gamepads[i].axes[axis] = value
 				break
 			}
@@ -164,9 +170,6 @@ shutdown_gamepad :: proc() {
 	for i in 0 ..< MAX_GAMEPADS {
 		if gamepads[i].connected && gamepads[i].gamepad != nil {
 			sdl3.CloseGamepad(gamepads[i].gamepad)
-		}
-		if gamepads[i].connected {
-			delete(gamepads[i].name)
 		}
 		gamepads[i] = {}
 	}
