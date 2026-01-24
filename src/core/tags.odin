@@ -50,23 +50,13 @@ get_entities :: proc(tag: string) -> ^[dynamic]string {
 }
 
 remove_entity_tags :: proc(entity_id: string) {
-	keys_to_delete := make([dynamic]string, context.temp_allocator)
-	for tag in tags {
-		tag_list := &tags[tag]
+	for tag_key, &tag_list in tags {
 		for i := len(tag_list) - 1; i >= 0; i -= 1 {
 			if tag_list[i] == entity_id {
 				delete(tag_list[i])
-				ordered_remove(tag_list, i)
+				ordered_remove(&tag_list, i)
 			}
 		}
-		if len(tag_list) == 0 {
-			append(&keys_to_delete, tag)
-		}
-	}
-	for key in keys_to_delete {
-		delete(tags[key])
-		delete(key)
-		delete_key(&tags, key)
 	}
 }
 
