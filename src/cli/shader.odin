@@ -6,11 +6,11 @@ import "core:fmt"
 import "core:os"
 import "core:path/filepath"
 
-SHADER_COMMAND :: CLICommand {
-	name = "shader",
-	args_size = 1,
-	info_msg = "sucata shader <file> - Build shader to sucata shader file",
-	error_msg = "Error: 'shader' command requires a <file> argument.",
+SHADER_COMMAND :: Command {
+	command = "shader",
+	args_size = 0,
+	info_msg = "",
+	error_msg = "",
 	handler = proc(args: []string) {
 		file_path := args[0]
 		file_path = filepath.join({os.get_current_directory(), file_path})

@@ -8,8 +8,8 @@ import "core:os"
 import "core:path/filepath"
 import "core:strings"
 
-RUN_COMMAND :: CLICommand {
-	name = "run",
+RUN_COMMAND :: Command {
+	command = "run",
 	args_size = 1,
 	info_msg = "sucata run <file> [--entity <entity_file>] - Run a Sucata Lua script file",
 	error_msg = "Error: 'run' command requires a <file> argument.",

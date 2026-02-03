@@ -6,8 +6,8 @@ import "core:fmt"
 import "core:os"
 import "core:path/filepath"
 
-BUILD_COMMAND :: CLICommand {
-	name = "build",
+BUILD_COMMAND :: Command {
+	command = "build",
 	args_size = 1,
 	info_msg = "sucata build <file> [--icon <path>] - Build a Sucata Lua script file",
 	error_msg = "Error: 'build' command requires a <file> argument.",

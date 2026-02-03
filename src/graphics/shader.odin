@@ -65,6 +65,8 @@ init_shader :: proc(name: string, schd_path: string) -> bool {
 		ib       = ib,
 	}
 
+	fmt.printfln("Shader %s foi carregado!", name)
+
 	return true
 }
 
