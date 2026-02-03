@@ -3,6 +3,11 @@ package cli
 import "core:fmt"
 
 parse_cli :: proc(cmds: Command, args: []string) {
+	if len(args) == 0 {
+		help_commands(cmds, args)
+		return
+	}
+
 	command, ok := find_command(cmds, args[0])
 	if !ok {
 		help_commands(cmds, args)
