@@ -41,7 +41,7 @@ help_commands :: proc(cmds: Command, args: []string) {
 		fmt.printfln("Available %s commands:", cmds.command)
 	}
 	for cmd in cmds.subcommands {
-		fmt.println(cmd.info_msg)
+		fmt.println("  ", cmd.info_msg)
 	}
 }
 
