@@ -1,6 +1,8 @@
 package graphics
 
 import sg "../../sokol/gfx"
+import "../fs"
+import "../path"
 import "core:c"
 import "core:fmt"
 import "core:os"
@@ -13,19 +15,30 @@ CustomShader :: struct {
 
 custom_shaders := map[string]CustomShader{}
 
+get_shader_path :: proc(shader_path: string) -> ([]byte, bool) {
+	if asset_data, ok := fs.get_asset(shader_path); ok && len(asset_data) > 0 {
+		return asset_data, true
+	}
+	schd_data, ok := os.read_entire_file_from_filename(path.get_path(shader_path))
+	if !ok {
+		return {}, false
+	}
+
+	return schd_data, true
+}
+
 create_shader_from_schd :: proc(schd_data: []byte) -> (sg.Shader, [16]sg.Vertex_Attr_State) {
 	backend := sg.query_backend()
 	desc, formats := create_shader_desc_from_schd(backend, schd_data)
 	return sg.make_shader(desc), formats
 }
 
-// Render Shader
 init_shader :: proc(name: string, schd_path: string) -> bool {
 	if vlr, ok := custom_shaders[name]; ok {
 		return true
 	}
 
-	schd_data, ok := os.read_entire_file_from_filename(schd_path)
+	schd_data, ok := get_shader_path(schd_path)
 	if !ok {
 		fmt.println("Failed to read shader definition file: ", schd_path)
 		return false
@@ -64,8 +77,6 @@ init_shader :: proc(name: string, schd_path: string) -> bool {
 		pipeline = pipeline,
 		ib       = ib,
 	}
-
-	fmt.printfln("Shader %s foi carregado!", name)
 
 	return true
 }

@@ -21,5 +21,12 @@
 				"Run Project"
 			]
 		}
-	]
+	],
+	"Lua.workspace.library": [
+		"${3rd}/love2d/library",
+		"~/lua-addons/sucata-lua-addon/library",
+		"~/lua-addons/",
+		"${addons}/sucata/module/library"
+	],
+	"Lua.workspace.checkThirdParty": false
 }

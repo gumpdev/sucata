@@ -10,7 +10,7 @@ get_shader_attr_type :: proc(attr_type: string) -> sg.Shader_Attr_Base_Type {
 	case "Float":
 		return .FLOAT
 	case "Int":
-		return .UINT
+		return .SINT
 	}
 	return .FLOAT
 }
@@ -122,6 +122,30 @@ get_attr_vertex_format :: proc(format: string) -> sg.Vertex_Attr_State {
 	return {format = .INVALID}
 }
 
+json_array_to_cstring :: proc(arr: json.Array) -> string {
+	bytes := make([]u8, len(arr))
+	for v, i in arr {
+		bytes[i] = u8(v.(json.Float))
+	}
+	return strings.clone_from_bytes(bytes)
+}
+
+json_number_to_number :: proc(data: json.Value) -> f64 {
+	if (data == nil) {
+		return 0
+	}
+
+	#partial switch v in data {
+	case json.Null:
+		return 0
+	case json.Integer:
+		return f64(data.(json.Integer))
+	case json.Float:
+		return data.(json.Float)
+	}
+	return 0
+}
+
 create_shader_desc_from_schd :: proc(
 	backend: sg.Backend,
 	schd_data: []byte,
@@ -130,6 +154,10 @@ create_shader_desc_from_schd :: proc(
 	[16]sg.Vertex_Attr_State,
 ) {
 	json_data, json_ok := json.parse(schd_data)
+	if json_ok != .None {
+		panic("shader .schd JSON inválido")
+	}
+
 	desc: sg.Shader_Desc
 	formats := [16]sg.Vertex_Attr_State{}
 
@@ -139,13 +167,13 @@ create_shader_desc_from_schd :: proc(
 
 		desc.label = strings.clone_to_cstring(program["name"].(json.String))
 		desc.vertex_func.source = strings.clone_to_cstring(
-			program["vertex_func"].(json.Object)["data"].(json.String),
+			json_array_to_cstring(program["vertex_func"].(json.Object)["data"].(json.Array)),
 		)
 		desc.vertex_func.entry = strings.clone_to_cstring(
 			program["vertex_func"].(json.Object)["entry_point"].(json.String),
 		)
 		desc.fragment_func.source = strings.clone_to_cstring(
-			program["fragment_func"].(json.Object)["data"].(json.String),
+			json_array_to_cstring(program["fragment_func"].(json.Object)["data"].(json.Array)),
 		)
 		desc.fragment_func.entry = strings.clone_to_cstring(
 			program["fragment_func"].(json.Object)["entry_point"].(json.String),
@@ -169,7 +197,9 @@ create_shader_desc_from_schd :: proc(
 				uniform_block_obj["stage"].(json.String),
 			)
 			desc.uniform_blocks[uniform_index].layout = .STD140
-			desc.uniform_blocks[uniform_index].size = u32(uniform_block_obj["size"].(json.Integer))
+			desc.uniform_blocks[uniform_index].size = u32(
+				json_number_to_number(uniform_block_obj["size"]),
+			)
 
 			glsl_uniforms := uniform_block_obj["glsl_uniforms"].(json.Array)
 			for glsl_uniform, glsl_index in glsl_uniforms {
@@ -178,26 +208,30 @@ create_shader_desc_from_schd :: proc(
 				desc.uniform_blocks[uniform_index].glsl_uniforms[glsl_index].type =
 					get_uniform_type(glsl_uniform_obj["type"].(json.String))
 				desc.uniform_blocks[uniform_index].glsl_uniforms[glsl_index].array_count = u16(
-					glsl_uniform_obj["array_count"].(json.Integer),
+					json_number_to_number(glsl_uniform_obj["array_count"]),
 				)
-				desc.uniform_blocks[uniform_index].glsl_uniforms[glsl_index].glsl_name =
-					strings.clone_to_cstring(glsl_uniform_obj["struct_name"].(json.String))
+				struct_name := glsl_uniform_obj["struct_name"]
+				if struct_name != nil {
+					desc.uniform_blocks[uniform_index].glsl_uniforms[glsl_index].glsl_name =
+						strings.clone_to_cstring(struct_name.(json.String))
+				}
 			}
 		}
 
 		for view, view_index in program["views"].(json.Array) {
 			view_obj := view.(json.Object)
+			texture_obj := view_obj["texture"].(json.Object)
 
 			desc.views[view_index].texture.stage = get_shader_stage(
-				view_obj["stage"].(json.String),
+				texture_obj["stage"].(json.String),
 			)
 			desc.views[view_index].texture.image_type = get_image_type(
-				view_obj["type"].(json.String),
+				texture_obj["type"].(json.String),
 			)
 			desc.views[view_index].texture.sample_type = get_image_sample_type(
-				view_obj["sample_type"].(json.String),
+				texture_obj["sample_type"].(json.String),
 			)
-			desc.views[view_index].texture.multisampled = view_obj["multisampled"].(json.Boolean)
+			desc.views[view_index].texture.multisampled = texture_obj["multisampled"].(json.Boolean)
 		}
 
 		for sampler, sampler_index in program["samplers"].(json.Array) {
@@ -218,10 +252,10 @@ create_shader_desc_from_schd :: proc(
 				pair_obj["stage"].(json.String),
 			)
 			desc.texture_sampler_pairs[pair_index].view_slot = u8(
-				pair_obj["view_slot"].(json.Integer),
+				json_number_to_number(pair_obj["view_slot"]),
 			)
 			desc.texture_sampler_pairs[pair_index].sampler_slot = u8(
-				pair_obj["sampler_slot"].(json.Integer),
+				json_number_to_number(pair_obj["sampler_slot"]),
 			)
 			desc.texture_sampler_pairs[pair_index].glsl_name = strings.clone_to_cstring(
 				fmt.aprintf(
@@ -236,7 +270,7 @@ create_shader_desc_from_schd :: proc(
 
 		desc.label = strings.clone_to_cstring(program["name"].(json.String))
 		desc.vertex_func.source = strings.clone_to_cstring(
-			program["vertex_func"].(json.Object)["data"].(json.String),
+			json_array_to_cstring(program["vertex_func"].(json.Object)["data"].(json.Array)),
 		)
 		desc.vertex_func.entry = strings.clone_to_cstring(
 			program["vertex_func"].(json.Object)["d3d11_target"].(json.String),
@@ -245,7 +279,7 @@ create_shader_desc_from_schd :: proc(
 			program["vertex_func"].(json.Object)["entry_point"].(json.String),
 		)
 		desc.fragment_func.source = strings.clone_to_cstring(
-			program["fragment_func"].(json.Object)["data"].(json.String),
+			json_array_to_cstring(program["fragment_func"].(json.Object)["data"].(json.Array)),
 		)
 		desc.fragment_func.entry = strings.clone_to_cstring(
 			program["fragment_func"].(json.Object)["entry_point"].(json.String),
@@ -263,7 +297,9 @@ create_shader_desc_from_schd :: proc(
 			desc.attrs[attr_index].hlsl_sem_name = strings.clone_to_cstring(
 				attr_obj["hlsl_sem_name"].(json.String),
 			)
-			desc.attrs[attr_index].hlsl_sem_index = u8(attr_obj["hlsl_sem_index"].(json.Integer))
+			desc.attrs[attr_index].hlsl_sem_index = u8(
+				json_number_to_number(attr_obj["hlsl_sem_index"]),
+			)
 		}
 
 		for uniform_block, uniform_index in program["uniform_blocks"].(json.Array) {
@@ -273,27 +309,30 @@ create_shader_desc_from_schd :: proc(
 				uniform_block_obj["stage"].(json.String),
 			)
 			desc.uniform_blocks[uniform_index].layout = .STD140
-			desc.uniform_blocks[uniform_index].size = u32(uniform_block_obj["size"].(json.Integer))
+			desc.uniform_blocks[uniform_index].size = u32(
+				json_number_to_number(uniform_block_obj["size"]),
+			)
 			desc.uniform_blocks[uniform_index].hlsl_register_b_n = u8(
-				uniform_block_obj["hlsl_register_b_n"].(json.Integer),
+				json_number_to_number(uniform_block_obj["hlsl_register_b_n"]),
 			)
 		}
 
 		for view, view_index in program["views"].(json.Array) {
 			view_obj := view.(json.Object)
+			texture_obj := view_obj["texture"].(json.Object)
 
 			desc.views[view_index].texture.stage = get_shader_stage(
-				view_obj["stage"].(json.String),
+				texture_obj["stage"].(json.String),
 			)
 			desc.views[view_index].texture.image_type = get_image_type(
-				view_obj["type"].(json.String),
+				texture_obj["type"].(json.String),
 			)
 			desc.views[view_index].texture.sample_type = get_image_sample_type(
-				view_obj["sample_type"].(json.String),
+				texture_obj["sample_type"].(json.String),
 			)
-			desc.views[view_index].texture.multisampled = view_obj["multisampled"].(json.Boolean)
+			desc.views[view_index].texture.multisampled = texture_obj["multisampled"].(json.Boolean)
 			desc.views[view_index].texture.hlsl_register_t_n = u8(
-				view_obj["hlsl_register_t_n"].(json.Integer),
+				json_number_to_number(texture_obj["hlsl_register_t_n"]),
 			)
 		}
 
@@ -307,7 +346,7 @@ create_shader_desc_from_schd :: proc(
 				sampler_obj["sampler_type"].(json.String),
 			)
 			desc.samplers[sampler_index].hlsl_register_s_n = u8(
-				sampler_obj["hlsl_register_s_n"].(json.Integer),
+				json_number_to_number(sampler_obj["hlsl_register_s_n"]),
 			)
 		}
 
@@ -318,10 +357,10 @@ create_shader_desc_from_schd :: proc(
 				pair_obj["stage"].(json.String),
 			)
 			desc.texture_sampler_pairs[pair_index].view_slot = u8(
-				pair_obj["view_slot"].(json.Integer),
+				json_number_to_number(pair_obj["view_slot"]),
 			)
 			desc.texture_sampler_pairs[pair_index].sampler_slot = u8(
-				pair_obj["sampler_slot"].(json.Integer),
+				json_number_to_number(pair_obj["sampler_slot"]),
 			)
 		}
 	case .METAL_MACOS:
@@ -329,13 +368,13 @@ create_shader_desc_from_schd :: proc(
 
 		desc.label = strings.clone_to_cstring(program["name"].(json.String))
 		desc.vertex_func.source = strings.clone_to_cstring(
-			program["vertex_func"].(json.Object)["data"].(json.String),
+			json_array_to_cstring(program["vertex_func"].(json.Object)["data"].(json.Array)),
 		)
 		desc.vertex_func.entry = strings.clone_to_cstring(
 			program["vertex_func"].(json.Object)["entry_point"].(json.String),
 		)
 		desc.fragment_func.source = strings.clone_to_cstring(
-			program["fragment_func"].(json.Object)["data"].(json.String),
+			json_array_to_cstring(program["fragment_func"].(json.Object)["data"].(json.Array)),
 		)
 		desc.fragment_func.entry = strings.clone_to_cstring(
 			program["fragment_func"].(json.Object)["entry_point"].(json.String),
@@ -356,27 +395,30 @@ create_shader_desc_from_schd :: proc(
 				uniform_block_obj["stage"].(json.String),
 			)
 			desc.uniform_blocks[uniform_index].layout = .STD140
-			desc.uniform_blocks[uniform_index].size = u32(uniform_block_obj["size"].(json.Integer))
+			desc.uniform_blocks[uniform_index].size = u32(
+				json_number_to_number(uniform_block_obj["size"]),
+			)
 			desc.uniform_blocks[uniform_index].msl_buffer_n = u8(
-				uniform_block_obj["msl_buffer_n"].(json.Integer),
+				json_number_to_number(uniform_block_obj["msl_buffer_n"]),
 			)
 		}
 
 		for view, view_index in program["views"].(json.Array) {
 			view_obj := view.(json.Object)
+			texture_obj := view_obj["texture"].(json.Object)
 
 			desc.views[view_index].texture.stage = get_shader_stage(
-				view_obj["stage"].(json.String),
+				texture_obj["stage"].(json.String),
 			)
 			desc.views[view_index].texture.image_type = get_image_type(
-				view_obj["type"].(json.String),
+				texture_obj["type"].(json.String),
 			)
 			desc.views[view_index].texture.sample_type = get_image_sample_type(
-				view_obj["sample_type"].(json.String),
+				texture_obj["sample_type"].(json.String),
 			)
-			desc.views[view_index].texture.multisampled = view_obj["multisampled"].(json.Boolean)
+			desc.views[view_index].texture.multisampled = texture_obj["multisampled"].(json.Boolean)
 			desc.views[view_index].texture.msl_texture_n = u8(
-				view_obj["msl_texture_n"].(json.Integer),
+				json_number_to_number(texture_obj["msl_texture_n"]),
 			)
 		}
 
@@ -390,7 +432,7 @@ create_shader_desc_from_schd :: proc(
 				sampler_obj["sampler_type"].(json.String),
 			)
 			desc.samplers[sampler_index].msl_sampler_n = u8(
-				sampler_obj["msl_sampler_n"].(json.Integer),
+				json_number_to_number(sampler_obj["msl_sampler_n"]),
 			)
 		}
 
@@ -401,10 +443,10 @@ create_shader_desc_from_schd :: proc(
 				pair_obj["stage"].(json.String),
 			)
 			desc.texture_sampler_pairs[pair_index].view_slot = u8(
-				pair_obj["view_slot"].(json.Integer),
+				json_number_to_number(pair_obj["view_slot"]),
 			)
 			desc.texture_sampler_pairs[pair_index].sampler_slot = u8(
-				pair_obj["sampler_slot"].(json.Integer),
+				json_number_to_number(pair_obj["sampler_slot"]),
 			)
 		}
 	case .WGPU:
@@ -412,13 +454,13 @@ create_shader_desc_from_schd :: proc(
 
 		desc.label = strings.clone_to_cstring(program["name"].(json.String))
 		desc.vertex_func.source = strings.clone_to_cstring(
-			program["vertex_func"].(json.Object)["data"].(json.String),
+			json_array_to_cstring(program["vertex_func"].(json.Object)["data"].(json.Array)),
 		)
 		desc.vertex_func.entry = strings.clone_to_cstring(
 			program["vertex_func"].(json.Object)["entry_point"].(json.String),
 		)
 		desc.fragment_func.source = strings.clone_to_cstring(
-			program["fragment_func"].(json.Object)["data"].(json.String),
+			json_array_to_cstring(program["fragment_func"].(json.Object)["data"].(json.Array)),
 		)
 		desc.fragment_func.entry = strings.clone_to_cstring(
 			program["fragment_func"].(json.Object)["entry_point"].(json.String),
@@ -439,27 +481,30 @@ create_shader_desc_from_schd :: proc(
 				uniform_block_obj["stage"].(json.String),
 			)
 			desc.uniform_blocks[uniform_index].layout = .STD140
-			desc.uniform_blocks[uniform_index].size = u32(uniform_block_obj["size"].(json.Integer))
+			desc.uniform_blocks[uniform_index].size = u32(
+				json_number_to_number(uniform_block_obj["size"]),
+			)
 			desc.uniform_blocks[uniform_index].wgsl_group0_binding_n = u8(
-				uniform_block_obj["wgsl_group0_binding_n"].(json.Integer),
+				json_number_to_number(uniform_block_obj["wgsl_group0_binding_n"]),
 			)
 		}
 
 		for view, view_index in program["views"].(json.Array) {
 			view_obj := view.(json.Object)
+			texture_obj := view_obj["texture"].(json.Object)
 
 			desc.views[view_index].texture.stage = get_shader_stage(
-				view_obj["stage"].(json.String),
+				texture_obj["stage"].(json.String),
 			)
 			desc.views[view_index].texture.image_type = get_image_type(
-				view_obj["type"].(json.String),
+				texture_obj["type"].(json.String),
 			)
 			desc.views[view_index].texture.sample_type = get_image_sample_type(
-				view_obj["sample_type"].(json.String),
+				texture_obj["sample_type"].(json.String),
 			)
-			desc.views[view_index].texture.multisampled = view_obj["multisampled"].(json.Boolean)
+			desc.views[view_index].texture.multisampled = texture_obj["multisampled"].(json.Boolean)
 			desc.views[view_index].texture.wgsl_group1_binding_n = u8(
-				view_obj["wgsl_group1_binding_n"].(json.Integer),
+				json_number_to_number(texture_obj["wgsl_group1_binding_n"]),
 			)
 		}
 
@@ -473,7 +518,7 @@ create_shader_desc_from_schd :: proc(
 				sampler_obj["sampler_type"].(json.String),
 			)
 			desc.samplers[sampler_index].wgsl_group1_binding_n = u8(
-				sampler_obj["wgsl_group1_binding_n"].(json.Integer),
+				json_number_to_number(sampler_obj["wgsl_group1_binding_n"]),
 			)
 		}
 
@@ -484,10 +529,10 @@ create_shader_desc_from_schd :: proc(
 				pair_obj["stage"].(json.String),
 			)
 			desc.texture_sampler_pairs[pair_index].view_slot = u8(
-				pair_obj["view_slot"].(json.Integer),
+				json_number_to_number(pair_obj["view_slot"]),
 			)
 			desc.texture_sampler_pairs[pair_index].sampler_slot = u8(
-				pair_obj["sampler_slot"].(json.Integer),
+				json_number_to_number(pair_obj["sampler_slot"]),
 			)
 		}
 	}

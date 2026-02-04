@@ -1,6 +1,5 @@
 package graphic
 
-import sg "../../../sokol/gfx"
 import core "../../core"
 import "../../graphics"
 import lua_common "../lua_common"
