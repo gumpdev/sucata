@@ -106,6 +106,8 @@ init_callback :: proc "c" () {
 	if scene != nil && len(scene) > 0 {
 		run_init()
 	}
+
+	process_post_commands()
 }
 
 cleanup_callback :: proc "c" () {

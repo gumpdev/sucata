@@ -1,7 +1,6 @@
 package graphic
 
 import core "../../core"
-import "../../graphics"
 import lua_common "../lua_common"
 import "core:c"
 import "core:crypto"
@@ -18,7 +17,6 @@ LOAD_SHADER_FUNCTION :: lua_common.LuaFunction {
 		if !lua_common.validate_string(L, 1, "load_shader") do return 0
 
 		shader_file := strings.clone_from_cstring(lua.tostring(L, 1))
-		defer delete(shader_file)
 
 		shader_name: string
 		if lua.gettop(L) >= 2 {
@@ -28,7 +26,9 @@ LOAD_SHADER_FUNCTION :: lua_common.LuaFunction {
 			shader_name = uuid.to_string(uuid.generate_v4())
 		}
 
-		graphics.init_shader(shader_name, shader_file)
+		core.add_post_command(
+			core.PostLoadShader{shader_name = shader_name, shader_path = shader_file},
+		)
 
 		shader_name_uuid := strings.clone_to_cstring(shader_name)
 		defer delete(shader_name_uuid)
