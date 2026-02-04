@@ -4,6 +4,7 @@ import core "../../core"
 import "../../graphics"
 import lua_common "../lua_common"
 import "core:c"
+import "core:crypto"
 import "core:encoding/uuid"
 import "core:strings"
 import lua "vendor:lua/5.4"
@@ -23,6 +24,7 @@ LOAD_SHADER_FUNCTION :: lua_common.LuaFunction {
 		if lua.gettop(L) >= 2 {
 			shader_name = strings.clone_from_cstring(lua.tostring(L, 2))
 		} else {
+			context.random_generator = crypto.random_generator()
 			shader_name = uuid.to_string(uuid.generate_v4())
 		}
 
