@@ -89,6 +89,7 @@ quad :: proc(props: common.QuadObjectProps) {
 	rotation := props.rotation
 	atlas := props.atlas
 	fixed := props.fixed
+	shader := props.shader
 
 	if texture == "" {
 		texture = "__default__"
@@ -133,7 +134,13 @@ quad :: proc(props: common.QuadObjectProps) {
 	quad_vb := sg.make_buffer(
 		{size = uint(4 * size_of(Vertex_Data)), data = sg_range(vertices[:])},
 	)
-	sg.apply_pipeline(quad_pipeline)
+	if shader == "" {
+		sg.apply_pipeline(quad_pipeline)
+	} else {
+		if shd, ok := custom_shaders[shader]; ok {
+			sg.apply_pipeline(shd.pipeline)
+		}
+	}
 	sg.apply_uniforms(0, {ptr = &mvp, size = size_of(mvp)})
 
 	quad_image := image.view

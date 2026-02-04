@@ -30,6 +30,7 @@ RECT_FUNCTION :: lua_common.LuaFunction {
 		rotation := f32(lua_common.get_table_number(L, 1, "rotation", 0.0))
 		opacity := lua_common.get_table_number_nil(L, 1, "opacity")
 		fixed := lua_common.get_table_boolean(L, 1, "fixed", false)
+		shader := lua_common.get_table_string(L, 1, "shader", "")
 
 		atlas_width := f32(lua_common.get_table_number(L, 1, "atlas_width", 0.0))
 		atlas_height := f32(lua_common.get_table_number(L, 1, "atlas_height", 0.0))
@@ -66,6 +67,7 @@ RECT_FUNCTION :: lua_common.LuaFunction {
 			origin = [2]f32{origin_x, origin_y},
 			rotation = rotation,
 			opacity = opacity,
+			shader = shader,
 			atlas = common.AtlasProps {
 				width = atlas_width,
 				height = atlas_height,

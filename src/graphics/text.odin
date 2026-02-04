@@ -209,10 +209,17 @@ text :: proc(props: common.TextObjectProps) {
 	fixed := props.fixed
 	align := props.align
 	max_width := props.maxWidth
+	shader := props.shader
 
 	position[1] += font_size / 2
 
-	sg.apply_pipeline(text_pipeline)
+	if shader == "" {
+		sg.apply_pipeline(text_pipeline)
+	} else {
+		if shd, ok := custom_shaders[shader]; ok {
+			sg.apply_pipeline(shd.pipeline)
+		}
+	}
 
 	lines := wrap_text(props.text, font, scale, max_width)
 	defer delete(lines)
