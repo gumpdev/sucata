@@ -27,6 +27,8 @@ inject_shader_data :: proc(yaml_data: YamlValue) -> YamlValue {
 
 		vertex_func["data"] = vertex_data
 		fragment_func["data"] = fragment_data
+		delete_key(&vertex_func, "path")
+		delete_key(&fragment_func, "path")
 	}
 
 	return yaml_data

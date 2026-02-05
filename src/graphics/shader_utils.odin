@@ -142,6 +142,12 @@ json_number_to_number :: proc(data: json.Value) -> f64 {
 		return f64(data.(json.Integer))
 	case json.Float:
 		return data.(json.Float)
+	case json.Boolean:
+		if data.(json.Boolean) {
+			return 1
+		} else {
+			return 0
+		}
 	}
 	return 0
 }
@@ -273,10 +279,10 @@ create_shader_desc_from_schd :: proc(
 			json_array_to_cstring(program["vertex_func"].(json.Object)["data"].(json.Array)),
 		)
 		desc.vertex_func.entry = strings.clone_to_cstring(
-			program["vertex_func"].(json.Object)["d3d11_target"].(json.String),
+			program["vertex_func"].(json.Object)["entry_point"].(json.String),
 		)
 		desc.vertex_func.d3d11_target = strings.clone_to_cstring(
-			program["vertex_func"].(json.Object)["entry_point"].(json.String),
+			program["vertex_func"].(json.Object)["d3d11_target"].(json.String),
 		)
 		desc.fragment_func.source = strings.clone_to_cstring(
 			json_array_to_cstring(program["fragment_func"].(json.Object)["data"].(json.Array)),
