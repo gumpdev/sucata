@@ -5,6 +5,7 @@ import "../camera"
 import "../common"
 import shader_quad "../shaders/quad"
 import "core:c"
+import "core:fmt"
 
 quad_ib: sg.Buffer
 quad_buffers_inited: bool
@@ -132,8 +133,13 @@ quad :: proc(props: common.QuadObjectProps) {
 	}
 
 	vertex_buffers := [8]sg.Buffer{}
+	has_vertex_buffer2 := false
 	vertex_buffers[0] = sg.make_buffer(
-		{size = uint(4 * size_of(Vertex_Data)), data = sg_range(vertices[:])},
+		{
+			usage = {vertex_buffer = true, immutable = true},
+			size = uint(4 * size_of(Vertex_Data)),
+			data = sg_range(vertices[:]),
+		},
 	)
 	if shader_name == "" {
 		sg.apply_pipeline(quad_pipeline)
@@ -142,9 +148,17 @@ quad :: proc(props: common.QuadObjectProps) {
 			sg.apply_pipeline(shader.pipeline)
 
 			shader_params := get_custom_shader_vertex_data(shader, shader_args)
-			vertex_buffers[1] = sg.make_buffer(
-				{size = uint(4 * len(shader_params)), data = sg_range(shader_params[:])},
-			)
+
+			if len(shader_params) != 0 {
+				vertex_buffers[1] = sg.make_buffer(
+					{
+						usage = {vertex_buffer = true, immutable = true},
+						size = uint(4 * len(shader_params)),
+						data = sg_range(shader_params[:]),
+					},
+				)
+				has_vertex_buffer2 = true
+			}
 		}
 	}
 	sg.apply_uniforms(0, {ptr = &mvp, size = size_of(mvp)})
@@ -161,7 +175,7 @@ quad :: proc(props: common.QuadObjectProps) {
 	sg.draw(0, 6, 1)
 
 	sg.destroy_buffer(vertex_buffers[0])
-	if shader_name != "" {
+	if has_vertex_buffer2 {
 		sg.destroy_buffer(vertex_buffers[1])
 	}
 }

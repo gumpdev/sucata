@@ -215,6 +215,7 @@ text :: proc(props: common.TextObjectProps) {
 	position[1] += font_size / 2
 
 	vertex_buffers := [8]sg.Buffer{}
+	has_vertex_buffer2 := false
 	if shader_name == "" {
 		sg.apply_pipeline(text_pipeline)
 	} else {
@@ -222,9 +223,16 @@ text :: proc(props: common.TextObjectProps) {
 			sg.apply_pipeline(shader.pipeline)
 
 			shader_params := get_custom_shader_vertex_data(shader, shader_args)
-			vertex_buffers[1] = sg.make_buffer(
-				{size = uint(4 * len(shader_params)), data = sg_range(shader_params[:])},
-			)
+			if len(shader_params) != 0 {
+				vertex_buffers[1] = sg.make_buffer(
+					{
+						usage = {vertex_buffer = true, immutable = true},
+						size = uint(4 * len(shader_params)),
+						data = sg_range(shader_params[:]),
+					},
+				)
+				has_vertex_buffer2 = true
+			}
 		}
 	}
 
@@ -309,7 +317,11 @@ text :: proc(props: common.TextObjectProps) {
 			}
 
 			vertex_buffers[0] = sg.make_buffer(
-				{size = uint(4 * size_of(Vertex_Data)), data = sg_range(vertices[:])},
+				{
+					usage = {vertex_buffer = true, immutable = true},
+					size = uint(4 * size_of(Vertex_Data)),
+					data = sg_range(vertices[:]),
+				},
 			)
 			sg.apply_uniforms(0, {ptr = &mvp, size = size_of(mvp)})
 
@@ -324,7 +336,7 @@ text :: proc(props: common.TextObjectProps) {
 			sg.draw(0, 6, 1)
 
 			sg.destroy_buffer(vertex_buffers[0])
-			if shader_name != "" {
+			if has_vertex_buffer2 {
 				sg.destroy_buffer(vertex_buffers[1])
 			}
 
