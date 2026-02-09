@@ -1,5 +1,6 @@
 package graphics
 
+import sg "../../sokol/gfx"
 import "core:math/linalg"
 
 Vec2 :: [2]f32
@@ -10,6 +11,14 @@ Vertex_Data :: struct {
 	position: Vec2,
 	col:      Vec4,
 	uv:       Vec2,
+}
+
+ShaderAttribute :: struct {
+	name:   string,
+	type:   sg.Vertex_Format,
+	slot:   int,
+	offset: int,
+	size:   int,
 }
 
 get_fixed_mvp :: proc() -> matrix[4, 4]f32 {

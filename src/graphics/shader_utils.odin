@@ -5,7 +5,49 @@ import "core:encoding/json"
 import "core:fmt"
 import "core:strings"
 
-get_shader_attr_type :: proc(attr_type: string) -> sg.Shader_Attr_Base_Type {
+get_shader_attr_type :: proc(type: string, base_type: string) -> sg.Vertex_Format {
+	switch type {
+	case "float":
+		return .FLOAT
+	case "int":
+		return .INT
+	case "vec2":
+		if base_type == "Int" {
+			return .INT2
+		} else {
+			return .FLOAT2
+		}
+	case "vec3":
+		if base_type == "Int" {
+			return .INT3
+		} else {
+			return .FLOAT3
+		}
+	case "vec4":
+		if base_type == "Int" {
+			return .INT4
+		} else {
+			return .FLOAT4
+		}
+	}
+	return .INVALID
+}
+
+get_shader_attr_type_size :: proc(attr_type: sg.Vertex_Format) -> int {
+	#partial switch attr_type {
+	case .FLOAT, .INT:
+		return 4
+	case .FLOAT2, .INT2:
+		return 8
+	case .FLOAT3, .INT3:
+		return 12
+	case .FLOAT4, .INT4:
+		return 16
+	}
+	return 0
+}
+
+get_shader_base_attr_type :: proc(attr_type: string) -> sg.Shader_Attr_Base_Type {
 	switch attr_type {
 	case "Float":
 		return .FLOAT
@@ -152,12 +194,42 @@ json_number_to_number :: proc(data: json.Value) -> f64 {
 	return 0
 }
 
+create_shader_attributes :: proc(json_data: json.Value) -> [16]ShaderAttribute {
+	program := find_program_in_schd(json_data, "glsl430")
+	attrs := program["attrs"].(json.Array)
+	attributes := [16]ShaderAttribute{}
+	offset := 0
+	i := 0
+
+	for attr, attr_index in program["attrs"].(json.Array) {
+		attr_obj := attr.(json.Object)
+		attr_name := attr_obj["glsl_name"].(json.String)
+		attr_type := attr_obj["type"].(json.String)
+		attr_base_type := attr_obj["base_type"].(json.String)
+		attr_slot := json_number_to_number(attr_obj["slot"])
+
+		attr_type_enum := get_shader_attr_type(attr_type, attr_base_type)
+		attr_type_size := get_shader_attr_type_size(attr_type_enum)
+
+		attributes[i] = ShaderAttribute {
+			name   = attr_name,
+			type   = attr_type_enum,
+			slot   = int(attr_slot),
+			size   = attr_type_size,
+			offset = offset,
+		}
+		i += 1
+		offset += attr_type_size
+	}
+	return attributes
+}
+
 create_shader_desc_from_schd :: proc(
 	backend: sg.Backend,
 	schd_data: []byte,
 ) -> (
 	sg.Shader_Desc,
-	[16]sg.Vertex_Attr_State,
+	[16]ShaderAttribute,
 ) {
 	json_data, json_ok := json.parse(schd_data)
 	if json_ok != .None {
@@ -165,7 +237,7 @@ create_shader_desc_from_schd :: proc(
 	}
 
 	desc: sg.Shader_Desc
-	formats := [16]sg.Vertex_Attr_State{}
+	attributes := create_shader_attributes(json_data)
 
 	#partial switch backend {
 	case .GLCORE:
@@ -188,9 +260,8 @@ create_shader_desc_from_schd :: proc(
 		for attr, attr_index in program["attrs"].(json.Array) {
 			attr_obj := attr.(json.Object)
 			attr_type := attr_obj["type"].(json.String)
-			formats[attr_index] = get_attr_vertex_format(attr_type)
 
-			desc.attrs[attr_index].base_type = get_shader_attr_type(attr_type)
+			desc.attrs[attr_index].base_type = get_shader_base_attr_type(attr_type)
 			desc.attrs[attr_index].glsl_name = strings.clone_to_cstring(
 				attr_obj["glsl_name"].(json.String),
 			)
@@ -297,9 +368,8 @@ create_shader_desc_from_schd :: proc(
 		for attr, attr_index in program["attrs"].(json.Array) {
 			attr_obj := attr.(json.Object)
 			attr_type := attr_obj["type"].(json.String)
-			formats[attr_index] = get_attr_vertex_format(attr_type)
 
-			desc.attrs[attr_index].base_type = get_shader_attr_type(attr_type)
+			desc.attrs[attr_index].base_type = get_shader_base_attr_type(attr_type)
 			desc.attrs[attr_index].hlsl_sem_name = strings.clone_to_cstring(
 				attr_obj["hlsl_sem_name"].(json.String),
 			)
@@ -389,9 +459,8 @@ create_shader_desc_from_schd :: proc(
 		for attr, attr_index in program["attrs"].(json.Array) {
 			attr_obj := attr.(json.Object)
 			attr_type := attr_obj["type"].(json.String)
-			formats[attr_index] = get_attr_vertex_format(attr_type)
 
-			desc.attrs[attr_index].base_type = get_shader_attr_type(attr_type)
+			desc.attrs[attr_index].base_type = get_shader_base_attr_type(attr_type)
 		}
 
 		for uniform_block, uniform_index in program["uniform_blocks"].(json.Array) {
@@ -475,9 +544,8 @@ create_shader_desc_from_schd :: proc(
 		for attr, attr_index in program["attrs"].(json.Array) {
 			attr_obj := attr.(json.Object)
 			attr_type := attr_obj["type"].(json.String)
-			formats[attr_index] = get_attr_vertex_format(attr_type)
 
-			desc.attrs[attr_index].base_type = get_shader_attr_type(attr_type)
+			desc.attrs[attr_index].base_type = get_shader_base_attr_type(attr_type)
 		}
 
 		for uniform_block, uniform_index in program["uniform_blocks"].(json.Array) {
@@ -542,5 +610,5 @@ create_shader_desc_from_schd :: proc(
 			)
 		}
 	}
-	return desc, formats
+	return desc, attributes
 }

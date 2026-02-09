@@ -151,6 +151,9 @@ quad :: proc(props: common.QuadObjectProps) {
 		samplers = {shader_quad.SMP_smp = quad_sampler},
 	}
 
+	//views
+	//uniforms
+
 	sg.apply_bindings(bindings)
 	sg.draw(0, 6, 1)
 

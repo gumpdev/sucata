@@ -1,6 +1,7 @@
 package graphics
 
 import sg "../../sokol/gfx"
+import "../common"
 import "../fs"
 import "../path"
 import "core:c"
@@ -8,9 +9,11 @@ import "core:fmt"
 import "core:os"
 
 CustomShader :: struct {
-	ib:       sg.Buffer,
-	shader:   sg.Shader,
-	pipeline: sg.Pipeline,
+	ib:              sg.Buffer,
+	shader:          sg.Shader,
+	pipeline:        sg.Pipeline,
+	attributes:      [16]ShaderAttribute,
+	attributes_size: int,
 }
 
 custom_shaders := map[string]CustomShader{}
@@ -27,10 +30,74 @@ get_shader_path :: proc(shader_path: string) -> ([]byte, bool) {
 	return schd_data, true
 }
 
-create_shader_from_schd :: proc(schd_data: []byte) -> (sg.Shader, [16]sg.Vertex_Attr_State) {
+DEFAULT_BUFFER :: [3]string{"position", "col", "uv"}
+
+get_shader_attributes_to_sokol_format :: proc(
+	attributes: [16]ShaderAttribute,
+) -> [16]sg.Vertex_Attr_State {
+	formats := [16]sg.Vertex_Attr_State{}
+	for attr, i in attributes {
+		buffer_index: i32 = 1
+		for default_attr in DEFAULT_BUFFER {
+			if attr.name == default_attr {
+				buffer_index = 0
+				break
+			}
+		}
+
+		formats[i] = sg.Vertex_Attr_State {
+			format       = attr.type,
+			buffer_index = buffer_index,
+			offset       = c.int(attr.offset),
+		}
+	}
+	return formats
+}
+
+get_shader_vertex_size :: proc(attributes: [16]ShaderAttribute) -> int {
+	size := 0
+	for attr in attributes {
+		size += attr.size
+	}
+	return size / 4
+}
+
+get_custom_shader_vertex_data :: proc(shader: CustomShader, props: common.ShaderArgs) -> []f32 {
+	vertex_size := shader.attributes_size
+
+	data := make([]f32, vertex_size)
+	parameters := shader.attributes
+	i := 0
+
+	for param in parameters {
+		if value, ok := props[param.name]; ok {
+			#partial switch v in value {
+			case f32:
+				data[i] = value.(f32)
+			case [2]f32:
+				data[i] = value.([2]f32)[0]
+				data[i + 1] = value.([2]f32)[1]
+			case [3]f32:
+				data[i] = value.([3]f32)[0]
+				data[i + 1] = value.([3]f32)[1]
+				data[i + 2] = value.([3]f32)[2]
+			case [4]f32:
+				data[i] = value.([4]f32)[0]
+				data[i + 1] = value.([4]f32)[1]
+				data[i + 2] = value.([4]f32)[2]
+				data[i + 3] = value.([4]f32)[3]
+			}
+		}
+		i += param.size / 4
+	}
+
+	return make([]f32, vertex_size)
+}
+
+create_shader_from_schd :: proc(schd_data: []byte) -> (sg.Shader, [16]ShaderAttribute) {
 	backend := sg.query_backend()
-	desc, formats := create_shader_desc_from_schd(backend, schd_data)
-	return sg.make_shader(desc), formats
+	desc, attributes := create_shader_desc_from_schd(backend, schd_data)
+	return sg.make_shader(desc), attributes
 }
 
 init_shader :: proc(name: string, schd_path: string) -> bool {
@@ -44,12 +111,15 @@ init_shader :: proc(name: string, schd_path: string) -> bool {
 		return false
 	}
 
-	shader, formats := create_shader_from_schd(schd_data)
+	shader, attributes := create_shader_from_schd(schd_data)
 
 	pipeline := sg.make_pipeline(
 		{
 			shader = shader,
-			layout = {buffers = {0 = {stride = c.int(size_of(Vertex_Data))}}, attrs = formats},
+			layout = {
+				buffers = {0 = {stride = c.int(size_of(Vertex_Data))}},
+				attrs = get_shader_attributes_to_sokol_format(attributes),
+			},
 			index_type = .UINT16,
 			colors = {
 				0 = {
@@ -73,9 +143,11 @@ init_shader :: proc(name: string, schd_path: string) -> bool {
 	)
 
 	custom_shaders[name] = CustomShader {
-		shader   = shader,
-		pipeline = pipeline,
-		ib       = ib,
+		shader          = shader,
+		pipeline        = pipeline,
+		ib              = ib,
+		attributes      = attributes,
+		attributes_size = get_shader_vertex_size(attributes),
 	}
 
 	return true
@@ -88,13 +160,4 @@ destroy_shaders :: proc() {
 		sg.destroy_shader(shader.shader)
 	}
 	custom_shaders = map[string]CustomShader{}
-}
-
-load_shader_from_path :: proc(path: string) -> (sg.Shader, [16]sg.Vertex_Attr_State) {
-	data, ok := os.read_entire_file_from_filename(path)
-	if !ok {
-		fmt.println("Failed to read shader file: ", path)
-		return sg.Shader{}, [16]sg.Vertex_Attr_State{}
-	}
-	return create_shader_from_schd(data)
 }

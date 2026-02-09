@@ -31,6 +31,7 @@ RECT_FUNCTION :: lua_common.LuaFunction {
 		opacity := lua_common.get_table_number_nil(L, 1, "opacity")
 		fixed := lua_common.get_table_boolean(L, 1, "fixed", false)
 		shader := lua_common.get_table_string(L, 1, "shader", "")
+		shader_args := lua_common.get_shader_args(L, 1)
 
 		atlas_width := f32(lua_common.get_table_number(L, 1, "atlas_width", 0.0))
 		atlas_height := f32(lua_common.get_table_number(L, 1, "atlas_height", 0.0))
@@ -77,6 +78,7 @@ RECT_FUNCTION :: lua_common.LuaFunction {
 				y = atlas_y,
 			},
 			fixed = fixed,
+			shader_args = shader_args,
 		}
 
 		core.add_to_render_queue(props)

@@ -15,14 +15,15 @@ AtlasProps :: struct {
 	y:       f32,
 }
 
-ShaderArgValue :: union {
+ShaderArgumentValue :: union {
 	f32,
 	[2]f32,
 	[3]f32,
 	[4]f32,
-	bool,
 	string,
 }
+
+ShaderArgs :: map[string]ShaderArgumentValue
 
 QuadObjectProps :: struct {
 	zIndex:      i32,
@@ -37,7 +38,7 @@ QuadObjectProps :: struct {
 	opacity:     Maybe(f32),
 	fixed:       bool,
 	atlas:       AtlasProps,
-	shader_args: map[string]ShaderArgValue,
+	shader_args: ShaderArgs,
 }
 
 TextObjectProps :: struct {
@@ -55,7 +56,7 @@ TextObjectProps :: struct {
 	opacity:     Maybe(f32),
 	align:       TextAlign,
 	maxWidth:    f32,
-	shader_args: map[string]ShaderArgValue,
+	shader_args: ShaderArgs,
 }
 
 GraphicObjectProps :: union {

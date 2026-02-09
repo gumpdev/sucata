@@ -33,6 +33,7 @@ TEXT_FUNCTION :: lua_common.LuaFunction {
 		max_width := f32(lua_common.get_table_number(L, 1, "max_width", 0.0))
 		opacity := lua_common.get_table_number_nil(L, 1, "opacity")
 		shader := lua_common.get_table_string(L, 1, "shader", "")
+		shader_args := lua_common.get_shader_args(L, 1)
 
 		if scale != 1.0 && (scale_x == 1.0 && scale_y == 1.0) {
 			scale_x = scale
@@ -55,20 +56,21 @@ TEXT_FUNCTION :: lua_common.LuaFunction {
 		}
 
 		props := common.TextObjectProps {
-			position = [2]f32{x, y},
-			color    = hex_to_rgba(color),
-			zIndex   = i32(zIndex),
-			font     = font,
-			size     = font_size,
-			shader   = shader,
-			scale    = [2]f32{scale_x, scale_y},
-			origin   = [2]f32{origin_x, origin_y},
-			rotation = rotation,
-			opacity  = opacity,
-			text     = text,
-			fixed    = fixed,
-			align    = text_align,
-			maxWidth = max_width,
+			position    = [2]f32{x, y},
+			color       = hex_to_rgba(color),
+			zIndex      = i32(zIndex),
+			font        = font,
+			size        = font_size,
+			shader      = shader,
+			scale       = [2]f32{scale_x, scale_y},
+			origin      = [2]f32{origin_x, origin_y},
+			rotation    = rotation,
+			opacity     = opacity,
+			text        = text,
+			fixed       = fixed,
+			align       = text_align,
+			maxWidth    = max_width,
+			shader_args = shader_args,
 		}
 
 		core.add_to_render_queue(props)
