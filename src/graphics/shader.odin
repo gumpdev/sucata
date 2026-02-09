@@ -35,20 +35,21 @@ DEFAULT_BUFFER :: [3]string{"position", "col", "uv"}
 get_shader_attributes_to_sokol_format :: proc(
 	attributes: [16]ShaderAttribute,
 ) -> [16]sg.Vertex_Attr_State {
-	formats := [16]sg.Vertex_Attr_State{}
-	for attr, i in attributes {
-		buffer_index: i32 = 1
-		for default_attr in DEFAULT_BUFFER {
-			if attr.name == default_attr {
-				buffer_index = 0
-				break
-			}
-		}
-
+	formats := [16]sg.Vertex_Attr_State {
+		0 = {format = .FLOAT2, buffer_index = 0, offset = 0},
+		1 = {format = .FLOAT4, buffer_index = 0, offset = 8},
+		2 = {format = .FLOAT2, buffer_index = 0, offset = 24},
+	}
+	i := 3
+	for attr in attributes {
 		formats[i] = sg.Vertex_Attr_State {
 			format       = attr.type,
-			buffer_index = buffer_index,
+			buffer_index = 1,
 			offset       = c.int(attr.offset),
+		}
+		i += 1
+		if i >= 16 {
+			break
 		}
 	}
 	return formats
@@ -91,7 +92,7 @@ get_custom_shader_vertex_data :: proc(shader: CustomShader, props: common.Shader
 		i += param.size / 4
 	}
 
-	return make([]f32, vertex_size)
+	return data
 }
 
 create_shader_from_schd :: proc(schd_data: []byte) -> (sg.Shader, [16]ShaderAttribute) {

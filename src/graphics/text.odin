@@ -209,15 +209,22 @@ text :: proc(props: common.TextObjectProps) {
 	fixed := props.fixed
 	align := props.align
 	max_width := props.maxWidth
-	shader := props.shader
+	shader_name := props.shader
+	shader_args := props.shader_args
 
 	position[1] += font_size / 2
 
-	if shader == "" {
+	vertex_buffers := [8]sg.Buffer{}
+	if shader_name == "" {
 		sg.apply_pipeline(text_pipeline)
 	} else {
-		if shd, ok := custom_shaders[shader]; ok {
-			sg.apply_pipeline(shd.pipeline)
+		if shader, ok := custom_shaders[shader_name]; ok {
+			sg.apply_pipeline(shader.pipeline)
+
+			shader_params := get_custom_shader_vertex_data(shader, shader_args)
+			vertex_buffers[1] = sg.make_buffer(
+				{size = uint(4 * len(shader_params)), data = sg_range(shader_params[:])},
+			)
 		}
 	}
 
@@ -301,13 +308,13 @@ text :: proc(props: common.TextObjectProps) {
 				mvp = camera.get_view_projection_matrix(game_width, game_height)
 			}
 
-			text_vb := sg.make_buffer(
+			vertex_buffers[0] = sg.make_buffer(
 				{size = uint(4 * size_of(Vertex_Data)), data = sg_range(vertices[:])},
 			)
 			sg.apply_uniforms(0, {ptr = &mvp, size = size_of(mvp)})
 
 			bindings := sg.Bindings {
-				vertex_buffers = {0 = text_vb},
+				vertex_buffers = vertex_buffers,
 				index_buffer = text_ib,
 				views = {shader_text.VIEW_tex = font.image},
 				samplers = {shader_text.SMP_smp = text_sampler},
@@ -316,7 +323,10 @@ text :: proc(props: common.TextObjectProps) {
 			sg.apply_bindings(bindings)
 			sg.draw(0, 6, 1)
 
-			sg.destroy_buffer(text_vb)
+			sg.destroy_buffer(vertex_buffers[0])
+			if shader_name != "" {
+				sg.destroy_buffer(vertex_buffers[1])
+			}
 
 			cursor_pos[0] += f32(baked_char.xadvance) * scale[0]
 		}

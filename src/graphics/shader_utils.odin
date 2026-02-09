@@ -211,6 +211,17 @@ create_shader_attributes :: proc(json_data: json.Value) -> [16]ShaderAttribute {
 		attr_type_enum := get_shader_attr_type(attr_type, attr_base_type)
 		attr_type_size := get_shader_attr_type_size(attr_type_enum)
 
+		is_default_buffer := false
+		for default_attr in DEFAULT_BUFFER {
+			if default_attr == attr_name {
+				is_default_buffer = true
+				break
+			}
+		}
+		if is_default_buffer {
+			continue
+		}
+
 		attributes[i] = ShaderAttribute {
 			name   = attr_name,
 			type   = attr_type_enum,
@@ -308,7 +319,8 @@ create_shader_desc_from_schd :: proc(
 			desc.views[view_index].texture.sample_type = get_image_sample_type(
 				texture_obj["sample_type"].(json.String),
 			)
-			desc.views[view_index].texture.multisampled = texture_obj["multisampled"].(json.Boolean)
+			desc.views[view_index].texture.multisampled =
+			texture_obj["multisampled"].(json.Boolean)
 		}
 
 		for sampler, sampler_index in program["samplers"].(json.Array) {
@@ -406,7 +418,8 @@ create_shader_desc_from_schd :: proc(
 			desc.views[view_index].texture.sample_type = get_image_sample_type(
 				texture_obj["sample_type"].(json.String),
 			)
-			desc.views[view_index].texture.multisampled = texture_obj["multisampled"].(json.Boolean)
+			desc.views[view_index].texture.multisampled =
+			texture_obj["multisampled"].(json.Boolean)
 			desc.views[view_index].texture.hlsl_register_t_n = u8(
 				json_number_to_number(texture_obj["hlsl_register_t_n"]),
 			)
@@ -491,7 +504,8 @@ create_shader_desc_from_schd :: proc(
 			desc.views[view_index].texture.sample_type = get_image_sample_type(
 				texture_obj["sample_type"].(json.String),
 			)
-			desc.views[view_index].texture.multisampled = texture_obj["multisampled"].(json.Boolean)
+			desc.views[view_index].texture.multisampled =
+			texture_obj["multisampled"].(json.Boolean)
 			desc.views[view_index].texture.msl_texture_n = u8(
 				json_number_to_number(texture_obj["msl_texture_n"]),
 			)
@@ -576,7 +590,8 @@ create_shader_desc_from_schd :: proc(
 			desc.views[view_index].texture.sample_type = get_image_sample_type(
 				texture_obj["sample_type"].(json.String),
 			)
-			desc.views[view_index].texture.multisampled = texture_obj["multisampled"].(json.Boolean)
+			desc.views[view_index].texture.multisampled =
+			texture_obj["multisampled"].(json.Boolean)
 			desc.views[view_index].texture.wgsl_group1_binding_n = u8(
 				json_number_to_number(texture_obj["wgsl_group1_binding_n"]),
 			)
