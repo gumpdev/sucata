@@ -2,43 +2,30 @@
 
 set -e
 
-echo "==========================="
-echo "  Sucata Installer (Unix)  "
-echo "==========================="
-echo
+echo "Installing sucata..."
 
-SUCATA_BIN="sucata"
-
-INSTALL_DIR="$HOME/.local/sucata"
-BIN_DIR="$HOME/.local/bin"
-LINK_PATH="$BIN_DIR/sucata"
+if ! command -v unzip >/dev/null && ! command -v 7z >/dev/null; then
+  echo "Error: Needs unzip or 7z to install Sucata"
+  exit 1
+fi
 
 OS=$(uname -s)
 ARCH=$(uname -m)
 
-echo "Detecting system..."
-echo "OS: $OS"
-echo "Architecture: $ARCH"
-echo
-
 if [[ "$OS" == "Darwin" ]]; then
   if [[ "$ARCH" == "arm64" ]]; then
-    TARGET="darwin_arm64"
-    echo "Detected: Apple Silicon (M1/M2/M3)"
+    TARGET="sucata-osx-arm"
   elif [[ "$ARCH" == "x86_64" ]]; then
-    TARGET="darwin_amd64"
-    echo "Detected: Apple Intel"
+    TARGET="sucata-osx-amd"
   else
     echo "ERROR: Unsupported macOS architecture: $ARCH"
     exit 1
   fi
 elif [[ "$OS" == "Linux" ]]; then
   if [[ "$ARCH" == "x86_64" ]]; then
-    TARGET="linux_amd64"
-    echo "Detected: Linux x86_64"
+    TARGET="sucata-linux-amd"
   elif [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
-    TARGET="linux_arm64"
-    echo "Detected: Linux ARM64"
+    TARGET="sucata-linux-arm"
   else
     echo "ERROR: Unsupported Linux architecture: $ARCH"
     exit 1
@@ -48,42 +35,54 @@ else
   exit 1
 fi
 
-echo
-echo "Building Sucata for target: $TARGET"
-echo
+SUCATA_VERSION="0.1.1"
+SUCATA_BIN="sucata"
+SUCATA_URL="https://github.com/gumpdev/sucata/releases/download/$SUCATA_VERSION/$TARGET.zip"
+SUCATA_DIR="$HOME/sucata"
+SUCATA_TEMP_ZIP="$SUCATA_DIR/temp.zip"
+SUCATA_BIN="$SUCATA_DIR/$SUCATA_BIN"
+SUCATA_BIN_LINK="$HOME/.local/bin/sucata"
 
-odin build . -out:sucata -target:$TARGET
+mkdir -p "$SUCATA_DIR"
 
-if [[ ! -f "$SUCATA_BIN" ]]; then
-  echo "ERROR: Build failed. File '$SUCATA_BIN' not found after compilation."
-  exit 1
+curl --fail --location --progress-bar --output "$SUCATA_TEMP_ZIP" "$SUCATA_URL"
+if command -v unzip >/dev/null; then
+	unzip -d "$SUCATA_DIR" -o "$SUCATA_TEMP_ZIP" >/dev/null
+else
+	7z x -o"$SUCATA_DIR" -y "$SUCATA_TEMP_ZIP" >/dev/null
 fi
 
-echo "Build successful!"
-echo
+chmod +x "$SUCATA_BIN"
+ln -sf "$SUCATA_BIN" "$SUCATA_BIN_LINK"
+echo "Sucata installed on $SUCATA_BIN"
 
-mkdir -p "$INSTALL_DIR"
-mkdir -p "$BIN_DIR"
+LINE='export PATH="$SUCATA_DIR:$PATH"'
+SHELL_NAME="$(basename "$SHELL")"
 
-echo "Copying files..."
-cp "$SUCATA_BIN" "$INSTALL_DIR/"
+add_to_file() {
+  local file="$1"
+  local line="$2"
 
-chmod +x "$INSTALL_DIR/$SUCATA_BIN"
+  if [ -f "$file" ]; then
+      if ! grep -qxF "$line" "$file"; then
+          echo "$line" >> "$file"
+      fi
+  else
+      echo "$line" >> "$file"
+  fi
+}
 
-if [[ -L "$LINK_PATH" || -f "$LINK_PATH" ]]; then
-  rm -f "$LINK_PATH"
-fi
-
-ln -s "$INSTALL_DIR/$SUCATA_BIN" "$LINK_PATH"
-
-echo
-echo "Installation complete!"
-echo "Files installed to: $INSTALL_DIR"
-echo "Symlink created at: $LINK_PATH"
-echo
-
-echo "If '~/.local/bin' is not in your PATH, add this line to your shell config:"
-echo '  export PATH="$HOME/.local/bin:$PATH"'
-echo "for example in ~/.bashrc, ~/.zshrc, etc."
-echo
-echo "After that, you can run the program simply by typing: sucata"
+case "$SHELL_NAME" in
+    bash)
+        add_to_file "$HOME/.bashrc" "$LINE"
+        echo "Added PATH to $HOME/.bashrc"
+        ;;
+    zsh)
+        add_to_file "$HOME/.zshrc" "$LINE"
+        echo "Added PATH to $HOME/.zshrc"
+        ;;
+    *)
+        echo "Shell not supported: $SHELL_NAME"
+        echo "Please add manually to PATH."
+        ;;
+esac

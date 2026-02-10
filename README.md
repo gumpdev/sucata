@@ -54,21 +54,15 @@ The goal is to make a create game experience similar good and smooth using only 
 
 ## 🔧 Installation
 
-1. Install [Odin](https://odin-lang.org)
-2. Clone the repository:
-	 ```bash
-	 git clone https://github.com/gumpdev/sucata.git
-	 ```
-3. Run installer script:
-	 ### For Linux and macOS
-	 ```bash
-	 cd sucata; ./install_unix.sh
-	 ```
-	 ### For Windows
-	 ```powershell
-	 cd sucata; ./install_windows.cmd
-	 ```
-4. Restart your terminal, then sucata command will be available
+### MacOS/Linux
+```sh
+curl -fsSL https://raw.githubusercontent.com/gumpdev/sucata/refs/heads/main/install_unix.sh | sh
+```
+
+### Windows
+```sh
+irm https://raw.githubusercontent.com/gumpdev/sucata/refs/heads/main/install_windows.ps1 | iex
+```
 
 ### Installing the Sucata Addon
 1. Install the [sumneko lua extension](https://luals.github.io/) on your favorite IDE
