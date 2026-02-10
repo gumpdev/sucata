@@ -4,7 +4,6 @@ import sapp "../../sokol/app"
 import common "../common"
 import "../fs"
 import "../path"
-import "core:fmt"
 import "core:strings"
 import stbi "vendor:stb/image"
 
@@ -28,7 +27,7 @@ load_window_icon :: proc(icon_path: string) -> sapp.Icon_Desc {
 	}
 
 	if pixels == nil {
-		fmt.printfln("Falha ao carregar ícone: %s, usando padrão", icon_path)
+		common.print_warning("Failed to load the icon: %s, using default", icon_path)
 		icon_desc.sokol_default = true
 		return icon_desc
 	}
@@ -84,7 +83,7 @@ set_window_icon :: proc(icon_path: string) {
 	}
 
 	if pixels == nil {
-		fmt.printfln("Failed to load the icon: %s", icon_path)
+		common.print_warning("Failed to load the icon: %s, using default", icon_path)
 		return
 	}
 

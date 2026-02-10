@@ -1,6 +1,6 @@
 package cli
 
-import "core:fmt"
+import "../common"
 
 VERSION_COMMAND :: Command {
 	command = "version",
@@ -8,7 +8,7 @@ VERSION_COMMAND :: Command {
 	info_msg = "sucata version - Show the Sucata game engine version",
 	error_msg = "Error: 'version' command does not take any arguments.",
 	handler = proc(args: []string) {
-		fmt.printfln("Version %s-%s", VERSION, VERSION_TYPE)
-		fmt.println("Released on", RELEASED_ON)
+		common.print("Version %s-%s", VERSION, VERSION_TYPE)
+		common.print_info("Released on %s", RELEASED_ON)
 	},
 }

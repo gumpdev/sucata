@@ -1,7 +1,6 @@
 package core
 
 import "../graphics"
-import "core:fmt"
 
 PostLoadShader :: struct {
 	shader_name: string,

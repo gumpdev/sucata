@@ -23,7 +23,8 @@ generate_assets :: proc(src_path: string, main_file: string, output_path: string
 
 	collect_paths(main_file, &files)
 
-	fmt.println("Found", len(files), "files to package. src:", src_path)
+	common.print_info("Packaging assets...")
+	common.print_info("Found %d files to package. src: %s", len(files), src_path)
 
 	entries := make([dynamic]common.Asset_Entry)
 	defer delete(entries)
@@ -39,7 +40,7 @@ generate_assets :: proc(src_path: string, main_file: string, output_path: string
 		defer delete(data)
 
 		if !read_ok {
-			fmt.printfln("Warning: File %s was not found!", file)
+			common.print_warning("File %s was not found!", file)
 			continue
 		}
 

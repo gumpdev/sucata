@@ -1,9 +1,9 @@
 package cli
 
+import "../common"
 import core "../core"
 import lua "../lua"
 import path "../path"
-import "core:fmt"
 import "core:os"
 import "core:path/filepath"
 import "core:strings"
@@ -28,14 +28,13 @@ RUN_COMMAND :: Command {
 		path.init_run_paths(file_path)
 
 		if entity_file != "" {
-			fmt.println(
-				"Running entity file:",
+			common.print_info(
+				"Running entity file: %s on the Sucata project: %s",
 				entity_file,
-				"on the Sucata project:",
 				path.location.file,
 			)
 		} else {
-			fmt.println("Running Sucata project:", path.location.file)
+			common.print("Running Sucata project: %s", path.location.file)
 		}
 
 		lua.init_lua(path.location.file, strings.trim_suffix(entity_file, ".lua"))

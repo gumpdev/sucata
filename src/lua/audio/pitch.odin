@@ -3,7 +3,6 @@ package audio
 import core "../../core"
 import lua_common "../lua_common"
 import "core:c"
-import "core:fmt"
 import lua "vendor:lua/5.4"
 
 GET_PITCH_FUNCTION :: lua_common.LuaFunction {

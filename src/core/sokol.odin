@@ -5,9 +5,9 @@ import sg "../../sokol/gfx"
 import sglue "../../sokol/glue"
 import shelpers "../../sokol/helpers"
 import st "../../sokol/time"
+import "../common"
 import "../fs"
 import "../graphics"
-import "../path"
 import "base:runtime"
 import "core:fmt"
 import "core:strings"
@@ -92,12 +92,12 @@ init_callback :: proc "c" () {
 	)
 	graphics.set_game_dimensions(windowConfig.width, windowConfig.height)
 	graphics.init_graphics()
-	fmt.printfln("Engine started with %s", sg.query_backend())
+	common.print_info("Sokol initialized with %s", sg.query_backend())
 
 	if audio_engine_init() {
-		fmt.printfln("Audio engine initialized")
+		common.print_info("Miniaudio initialized")
 	} else {
-		fmt.printfln("Failed to initialize audio engine")
+		common.print_error("Failed to initialize Miniaudio")
 	}
 
 	init_gamepad()

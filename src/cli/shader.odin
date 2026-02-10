@@ -1,8 +1,8 @@
 package cli
 
+import "../common"
 import path "../path"
 import "../shaderbuilder"
-import "core:fmt"
 import "core:os"
 import "core:path/filepath"
 
@@ -23,9 +23,14 @@ SHADER_BUILD_COMMAND :: Command {
 
 		path.init_run_paths(file_path)
 
-		fmt.println("Building shader:", path.location.file)
+		common.print_info("Building shader: %s", path.location.file)
 
-		shaderbuilder.build_shader(file_path)
+		output_path, success := shaderbuilder.build_shader(file_path)
+		if success {
+			common.print_success("Generated sucata shader: %s", output_path)
+		} else {
+			common.print_error("Failed to build shader: %s", path.location.file)
+		}
 	},
 }
 
@@ -54,10 +59,10 @@ SHADER_CREATE_COMMAND :: Command {
 		file_name := filepath.base(file_path)
 		if is_post_processing {
 			shaderbuilder.create_default_post_processing(file_path)
-			fmt.printfln("%s post processing shader created!", file_name)
+			common.print_success("%s post processing shader created!", file_name)
 		} else {
 			shaderbuilder.create_default_quad(file_path)
-			fmt.printfln("%s custom shader created!", file_name)
+			common.print_success("%s custom shader created!", file_name)
 		}
 	},
 }

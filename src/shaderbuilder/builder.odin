@@ -5,7 +5,7 @@ import "core:os/os2"
 import "core:path/filepath"
 import "core:strings"
 
-build_shader :: proc(input_file: string) -> bool {
+build_shader :: proc(input_file: string) -> (string, bool) {
 	ok, temp_path := build_sokol_shader(input_file)
 
 	shader_name := strings.split(filepath.base(input_file), ".")[0]
@@ -14,11 +14,9 @@ build_shader :: proc(input_file: string) -> bool {
 	if ok {
 		generate_json(temp_path, output_path)
 		remove_temp_folder(filepath.dir(temp_path))
-
-		fmt.println("Generated sucata shader:", output_path)
 	}
 
-	return ok
+	return output_path, ok
 }
 
 remove_temp_folder :: proc(temp_path: string) {

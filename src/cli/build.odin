@@ -1,8 +1,8 @@
 package cli
 
 import build "../build"
+import "../common"
 import path "../path"
-import "core:fmt"
 import "core:os"
 import "core:path/filepath"
 
@@ -25,9 +25,9 @@ BUILD_COMMAND :: Command {
 			}
 		}
 
-		fmt.println("Building Sucata script:", path.location.file)
+		common.print_info("Building Sucata from main script: %s", path.location.file)
 		if icon_path != "" {
-			fmt.println("Using icon:", icon_path)
+			common.print_info("Building with icon: %s", icon_path)
 		}
 
 		build_path := filepath.join({path.location.build, "build"})
@@ -35,6 +35,6 @@ BUILD_COMMAND :: Command {
 		assets_hash := build.generate_assets(path.location.src, path.location.file, build_path)
 		build.clone_engine(build_path, assets_hash, icon_path)
 
-		fmt.println("Sucateado! Game builded on", build_path)
+		common.print_success("Sucateado! Game builded on %s", build_path)
 	},
 }

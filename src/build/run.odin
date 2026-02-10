@@ -1,5 +1,6 @@
 package build
 
+import "../common"
 import "../core"
 import "../fs"
 import "../lua"
@@ -27,7 +28,7 @@ run :: proc(assets_hash: string) {
 
 	path.init_build_paths(assets_path)
 	fs.load_assets(assets_path)
-	fmt.println("Running Sucata script: ", path.location.file)
+	common.print_info("Running Sucata script: %s", path.location.file)
 
 	main_path := filepath.join({dir_path, "main.lua"})
 	lua.init_lua(path.location.file)

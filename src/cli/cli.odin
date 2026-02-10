@@ -1,6 +1,6 @@
 package cli
 
-import "core:fmt"
+import "../common"
 
 parse_cli :: proc(cmds: Command, args: []string) {
 	if len(args) == 0 {
@@ -28,20 +28,20 @@ parse_cli :: proc(cmds: Command, args: []string) {
 }
 
 error_command :: proc(cmd: Command) {
-	fmt.println(cmd.error_msg)
+	common.print_error(cmd.error_msg)
 }
 
 help_commands :: proc(cmds: Command, args: []string) {
 	if len(args) > 1 {
-		fmt.print("Command '%s' not found", args[0])
+		common.print_error("Command '%s' not found", args[0])
 	}
 	if cmds.command == "" {
-		fmt.printfln("Available commands:")
+		common.print("Available commands:")
 	} else {
-		fmt.printfln("Available %s commands:", cmds.command)
+		common.print("Available %s commands:", cmds.command)
 	}
 	for cmd in cmds.subcommands {
-		fmt.println("  ", cmd.info_msg)
+		common.print("  %s", cmd.info_msg)
 	}
 }
 

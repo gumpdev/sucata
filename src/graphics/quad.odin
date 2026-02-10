@@ -5,7 +5,6 @@ import "../camera"
 import "../common"
 import shader_quad "../shaders/quad"
 import "core:c"
-import "core:fmt"
 
 quad_ib: sg.Buffer
 quad_buffers_inited: bool
@@ -141,9 +140,7 @@ quad :: proc(props: common.QuadObjectProps) {
 			data = sg_range(vertices[:]),
 		},
 	)
-	if shader_name == "" {
-		sg.apply_pipeline(quad_pipeline)
-	} else {
+	if shader_name != "" {
 		if shader, ok := custom_shaders[shader_name]; ok {
 			sg.apply_pipeline(shader.pipeline)
 
@@ -159,7 +156,11 @@ quad :: proc(props: common.QuadObjectProps) {
 				)
 				has_vertex_buffer2 = true
 			}
+		} else {
+			sg.apply_pipeline(quad_pipeline)
 		}
+	} else {
+		sg.apply_pipeline(quad_pipeline)
 	}
 	sg.apply_uniforms(0, {ptr = &mvp, size = size_of(mvp)})
 

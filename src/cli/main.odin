@@ -1,11 +1,11 @@
 package cli
 
-import "core:fmt"
+import "../common"
 import "core:os"
 
-VERSION :: "0.1.1"
-VERSION_TYPE :: "stable"
-RELEASED_ON :: "2026-01"
+VERSION :: "0.2.0"
+VERSION_TYPE :: "nightly"
+RELEASED_ON :: "2026-02"
 ROOT_COMMAND :: Command {
 	subcommands = {RUN_COMMAND, BUILD_COMMAND, VERSION_COMMAND, SHADER_COMMAND},
 }
@@ -18,5 +18,5 @@ main :: proc() {
 }
 
 welcome_message :: proc() {
-	fmt.printfln("Sucata Game Engine - %s-%s", VERSION, VERSION_TYPE)
+	common.print("Sucata Game Engine - %s-%s", VERSION, VERSION_TYPE)
 }

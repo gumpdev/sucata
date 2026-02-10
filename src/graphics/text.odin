@@ -216,9 +216,7 @@ text :: proc(props: common.TextObjectProps) {
 
 	vertex_buffers := [8]sg.Buffer{}
 	has_vertex_buffer2 := false
-	if shader_name == "" {
-		sg.apply_pipeline(text_pipeline)
-	} else {
+	if shader_name != "" {
 		if shader, ok := custom_shaders[shader_name]; ok {
 			sg.apply_pipeline(shader.pipeline)
 
@@ -233,7 +231,11 @@ text :: proc(props: common.TextObjectProps) {
 				)
 				has_vertex_buffer2 = true
 			}
+		} else {
+			sg.apply_pipeline(quad_pipeline)
 		}
+	} else {
+		sg.apply_pipeline(quad_pipeline)
 	}
 
 	lines := wrap_text(props.text, font, scale, max_width)

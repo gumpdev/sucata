@@ -1,7 +1,7 @@
 package core
 
+import "../common"
 import "core:c"
-import "core:fmt"
 import "core:strings"
 import "vendor:sdl3"
 
@@ -22,14 +22,14 @@ gamepads: [MAX_GAMEPADS]GamepadState
 
 init_gamepad :: proc() {
 	if !sdl3.InitSubSystem({.GAMEPAD}) {
-		fmt.eprintln("Error in SDL3 Gamepad:", sdl3.GetError())
+		common.print_error("Failed to initialize SDL3")
 		return
 	}
 
 	joystick_count: c.int
 	joystick_ids := sdl3.GetJoysticks(&joystick_count)
 	if joystick_ids == nil {
-		fmt.eprintln("Error to get joysticks:", sdl3.GetError())
+		common.print_error("Error to get joysticks:", sdl3.GetError())
 		return
 	}
 	defer sdl3.free(joystick_ids)
@@ -60,7 +60,7 @@ add_gamepad :: proc(joystick_id: sdl3.JoystickID) -> bool {
 
 	gamepad := sdl3.OpenGamepad(joystick_id)
 	if gamepad == nil {
-		fmt.eprintln("Failed to run the gamepad:", sdl3.GetError())
+		common.print_error("Failed to run the gamepad:", sdl3.GetError())
 		return false
 	}
 

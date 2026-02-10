@@ -1,7 +1,8 @@
 package core
 
+import "../common"
 import "core:c"
-import "core:fmt"
+import "core:strings"
 import lua "vendor:lua/5.4"
 
 call_lua_function :: proc(L: ^lua.State, function_ref: i32) -> bool {
@@ -11,7 +12,7 @@ call_lua_function :: proc(L: ^lua.State, function_ref: i32) -> bool {
 	}
 
 	if lua.checkstack(L, 1) == 0 {
-		fmt.println("Error: Lua stack overflow")
+		common.print_error("Lua stack overflow")
 		return false
 	}
 
@@ -25,7 +26,7 @@ call_lua_function :: proc(L: ^lua.State, function_ref: i32) -> bool {
 	result := lua.pcall(L, 0, 0, 0)
 	if result != 0 {
 		msg := lua.tostring(L, -1)
-		fmt.println("[ERROR]", msg)
+		common.print_error("%s", msg)
 		lua.pop(L, 1)
 
 		lua.gc(L, lua.GCCOLLECT, 0)
@@ -43,12 +44,12 @@ call_lua_function_with_table_ref :: proc(
 ) -> bool {
 	top := lua.gettop(L)
 	if function_ref <= 0 || table_ref <= 0 {
-		fmt.println("Invalid function or table reference")
+		common.print_error("Invalid function or table reference")
 		return false
 	}
 
 	if lua.checkstack(L, 3) == 0 {
-		fmt.println("Error: Lua stack overflow")
+		common.print_error("Lua stack overflow")
 		return false
 	}
 
@@ -67,7 +68,7 @@ call_lua_function_with_table_ref :: proc(
 	result := lua.pcall(L, 1, 0, 0)
 	if result != 0 {
 		msg := lua.tostring(L, -1)
-		fmt.println("[ERROR]", msg)
+		common.print_error("%s", msg)
 		lua.pop(L, 1)
 	}
 

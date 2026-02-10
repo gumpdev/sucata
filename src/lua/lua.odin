@@ -1,6 +1,7 @@
 package lua
 
-import core "../core"
+import "../common"
+import "../core"
 import "../fs"
 import "../path"
 import "./audio"
@@ -210,7 +211,7 @@ init_lua :: proc(path: string, entity_file: string = "") {
 
 	if lua.L_loadbuffer(L, raw_data(code_str), len(code_str), chunk_name) != .OK {
 		err := lua.tostring(L, -1)
-		fmt.println("Erro ao carregar Lua:", err)
+		common.print_error("Failed to load Lua buffer: %s", err)
 		lua.pop(L, 1)
 		setup_garbage_collector(L, default_gc_config)
 		return
@@ -218,7 +219,7 @@ init_lua :: proc(path: string, entity_file: string = "") {
 
 	if lua.pcall(L, 0, lua.MULTRET, 0) != 0 {
 		err := lua.tostring(L, -1)
-		fmt.println("Erro Lua:", err)
+		common.print_error("Failed to execute Lua buffer: %s", err)
 		lua.pop(L, 1)
 	}
 
@@ -255,8 +256,8 @@ setup_garbage_collector :: proc(L: ^lua.State, config: GC_Config) {
 	lua.gc(L, lua.GCSETPAUSE, config.pause)
 	lua.gc(L, lua.GCSETSTEPMUL, config.step_mul)
 
-	fmt.printf(
-		"GC configurado - Pause: %d%%, StepMul: %d%%, Auto: %t\n",
+	common.print_info(
+		"Lua Garbage collector initialized - Pause: %d%%, StepMul: %d%%, Auto: %t",
 		config.pause,
 		config.step_mul,
 		config.auto_gc,

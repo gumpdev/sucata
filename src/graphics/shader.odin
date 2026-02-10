@@ -5,7 +5,6 @@ import "../common"
 import "../fs"
 import "../path"
 import "core:c"
-import "core:fmt"
 import "core:os"
 
 CustomShader :: struct {
@@ -108,7 +107,10 @@ init_shader :: proc(name: string, schd_path: string) -> bool {
 
 	schd_data, ok := get_shader_path(schd_path)
 	if !ok {
-		fmt.println("Failed to read shader definition file: ", schd_path)
+		common.print_warning(
+			"Failed to read shader definition file: %s, unable to create the shader",
+			schd_path,
+		)
 		return false
 	}
 

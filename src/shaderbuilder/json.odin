@@ -1,9 +1,8 @@
 package shader_builder
 
+import "../common"
 import "core:encoding/json"
-import "core:fmt"
 import "core:os"
-import "core:path/filepath"
 
 inject_shader_data :: proc(yaml_data: YamlValue) -> YamlValue {
 	shaders := yaml_data.(map[string]YamlValue)["shaders"].([]YamlValue)
@@ -21,7 +20,7 @@ inject_shader_data :: proc(yaml_data: YamlValue) -> YamlValue {
 		fragment_data, fragment_ok := os.read_entire_file_from_filename(fragment_path)
 
 		if !vertex_ok || !fragment_ok {
-			fmt.println("Failed to read shader files: ", vertex_path, ", ", fragment_path)
+			common.print_error("Failed to read shader files: %s, %s", vertex_path, fragment_path)
 			continue
 		}
 
@@ -38,7 +37,7 @@ generate_json :: proc(yaml_path: string, output_path: string) -> (string, bool) 
 	data, data_ok := os.read_entire_file_from_filename(yaml_path)
 
 	if !data_ok {
-		fmt.println("Failed to read generated shader file: ", yaml_path)
+		common.print_error("Failed to read generated shader file: %s", yaml_path)
 		return "", false
 	}
 
@@ -48,7 +47,7 @@ generate_json :: proc(yaml_path: string, output_path: string) -> (string, bool) 
 	json_data, json_ok := json.marshal(yaml_data)
 
 	if json_ok != json.Marshal_Data_Error.None {
-		fmt.println("Failed to convert YAML to JSON for shader: ", yaml_path)
+		common.print_error("Failed to convert YAML to JSON for shader: %s", yaml_path)
 		return "", false
 	}
 

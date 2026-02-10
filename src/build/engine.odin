@@ -1,5 +1,6 @@
 package build
 
+import "../common"
 import "../path"
 import "core:fmt"
 import "core:mem"
@@ -13,7 +14,7 @@ SDL_DLL_FILE_NAME :: "SDL3.dll"
 
 clone_engine :: proc(output_dir: string, assets_hash: string, icon_path: string = "") {
 	engine_path := path.get_executable_path()
-	fmt.println("Cloning engine from:", engine_path)
+	common.print_info("Cloning engine from: %s", engine_path)
 
 	engine_data, read_ok := os.read_entire_file(engine_path)
 	defer delete(engine_data)
@@ -116,17 +117,17 @@ create_macos_app_bundle :: proc(
 	executable_path := filepath.join({macos_path, engine_name})
 	exe_handle, open_err := os.open(executable_path, os.O_WRONLY | os.O_CREATE | os.O_TRUNC, 0o755)
 	if open_err != 0 {
-		fmt.println("Error opening executable for writing:", open_err)
+		common.print_error(fmt.tprintf("Error opening executable for writing: %s", open_err))
 		return
 	}
 
 	bytes_written, write_err := os.write(exe_handle, engine_data)
 	if write_err != 0 {
-		fmt.println("Error writing engine data:", write_err)
+		common.print_error(fmt.tprintf("Error writing engine data: %s", write_err))
 		os.close(exe_handle)
 		return
 	}
-	fmt.println("Written", bytes_written, "bytes of engine data")
+	common.print_info(fmt.tprintf("Written %d bytes of engine data", bytes_written))
 
 	write_build_header(exe_handle, assets_hash)
 	os.close(exe_handle)
@@ -196,12 +197,14 @@ create_macos_app_bundle :: proc(
 
 embed_windows_icon :: proc(exe_path: string, icon_path: string) {
 	if !os.exists(icon_path) {
-		fmt.println("Warning: Icon file not found:", icon_path)
+		common.print_warning(fmt.tprintf("Icon file not found: %s", icon_path))
 		return
 	}
 
 	if !strings.has_suffix(icon_path, ".ico") {
-		fmt.println("Warning: Windows requires .ico format for icons")
+		common.print_warning(
+			fmt.tprintf("Windows requires .ico format for icons. Provided: %s", icon_path),
+		)
 		return
 	}
 
@@ -210,15 +213,16 @@ embed_windows_icon :: proc(exe_path: string, icon_path: string) {
 	if icon_data, ok := os.read_entire_file(icon_path); ok {
 		os.write_entire_file(icon_output, icon_data)
 		delete(icon_data)
-		fmt.println("Icon copied to:", icon_output)
-		fmt.println("Note: To embed icon in .exe, use ResourceHacker or similar tool")
+		common.print_info(fmt.tprintf("Icon copied to: %s", icon_output))
 	}
 }
 
 remove_console_window :: proc(exe_path: string) {
 	data, read_ok := os.read_entire_file(exe_path)
 	if !read_ok {
-		fmt.println("Warning: Could not read executable to remove console")
+		common.print_warning(
+			fmt.tprintf("Could not read executable to remove console: %s", exe_path),
+		)
 		return
 	}
 	defer delete(data)

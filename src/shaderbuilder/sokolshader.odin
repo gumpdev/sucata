@@ -1,5 +1,6 @@
 package shader_builder
 
+import "../common"
 import "../path"
 import "base:runtime"
 import "core:fmt"
@@ -9,7 +10,7 @@ import "core:path/filepath"
 build_sokol_shader :: proc(input_file: string) -> (bool, string) {
 	sucata_path := filepath.dir(path.get_executable_path())
 	if !os2.exists(input_file) {
-		fmt.eprintln("Shader file does not exist:", input_file)
+		common.print_error("Shader file does not exist: %s", input_file)
 		return false, ""
 	}
 	if !os2.exists(filepath.join({sucata_path, "temp"})) {
@@ -42,7 +43,7 @@ build_sokol_shader :: proc(input_file: string) -> (bool, string) {
 		context.allocator,
 	)
 	if err != nil {
-		fmt.eprintln("Failed to execute process:", err)
+		common.print_error("Failed to execute process: %s", err)
 		os2.exit(1)
 	}
 
