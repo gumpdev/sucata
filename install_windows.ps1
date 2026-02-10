@@ -14,15 +14,17 @@ if (-not $hasExpandArchive -and -not $has7zip) {
 $ARCH = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
 
 if ($ARCH -eq "X64") {
-    $TARGET = "sucata-win-64"
+    $TARGET = "sucata-win-amd64"
 } elseif ($ARCH -eq "Arm64") {
-    $TARGET = "sucata-win-arm"
+    #$TARGET = "sucata-win-arm64"
+    Write-Error "Unsupported Windows architecture: $ARCH"
+    exit 1
 } else {
     Write-Error "Unsupported Windows architecture: $ARCH"
     exit 1
 }
 
-$SUCATA_VERSION = "0.2.0"
+$SUCATA_VERSION = "0.1.2"
 $SUCATA_NAME = "sucata.exe"
 $SUCATA_URL = "https://github.com/gumpdev/sucata/releases/download/$SUCATA_VERSION/$TARGET.zip"
 $SUCATA_DIR = Join-Path $HOME "sucata"

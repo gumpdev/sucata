@@ -14,18 +14,22 @@ ARCH=$(uname -m)
 
 if [[ "$OS" == "Darwin" ]]; then
   if [[ "$ARCH" == "arm64" ]]; then
-    TARGET="sucata-osx-arm"
+    TARGET="sucata-osx-arm64"
   elif [[ "$ARCH" == "x86_64" ]]; then
-    TARGET="sucata-osx-amd"
+    # TARGET="sucata-osx-amd64"
+    echo "ERROR: Unsupported macOS architecture: $ARCH"
+    exit 1
   else
     echo "ERROR: Unsupported macOS architecture: $ARCH"
     exit 1
   fi
 elif [[ "$OS" == "Linux" ]]; then
   if [[ "$ARCH" == "x86_64" ]]; then
-    TARGET="sucata-linux-amd"
+    TARGET="sucata-linux-amd64"
   elif [[ "$ARCH" == "aarch64" || "$ARCH" == "arm64" ]]; then
-    TARGET="sucata-linux-arm"
+    #TARGET="sucata-linux-arm64"
+    echo "ERROR: Unsupported Linux architecture: $ARCH"
+    exit 1
   else
     echo "ERROR: Unsupported Linux architecture: $ARCH"
     exit 1
@@ -35,7 +39,7 @@ else
   exit 1
 fi
 
-SUCATA_VERSION="0.2.0"
+SUCATA_VERSION="0.1.2"
 SUCATA_BIN="sucata"
 SUCATA_URL="https://github.com/gumpdev/sucata/releases/download/$SUCATA_VERSION/$TARGET.zip"
 SUCATA_DIR="$HOME/sucata"

@@ -3,7 +3,7 @@ package cli
 import "../common"
 import "core:os"
 
-VERSION :: "0.2.0"
+VERSION :: "0.1.2"
 VERSION_TYPE :: "nightly"
 RELEASED_ON :: "2026-02"
 ROOT_COMMAND :: Command {
