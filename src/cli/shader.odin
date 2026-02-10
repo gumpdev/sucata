@@ -21,7 +21,7 @@ SHADER_BUILD_COMMAND :: Command {
 		file_path := args[0]
 		file_path = filepath.join({os.get_current_directory(), file_path})
 
-		path.init_run_paths(file_path)
+		path.init_run_paths(file_path, "shader.glsl")
 
 		common.print_info("Building shader: %s", path.location.file)
 

@@ -5,13 +5,13 @@ import "core:os"
 import "core:path/filepath"
 import "core:strings"
 
-init_run_paths :: proc(file: string) {
+init_run_paths :: proc(file: string, default_file: string = "main.lua") {
 	file_absolute, ok_file_absolute := filepath.abs(file)
 
 	if os.is_file(file) {
 		location.file = file_absolute
 	} else {
-		location.file = filepath.join({file_absolute, "main.lua"})
+		location.file = filepath.join({file_absolute, default_file})
 	}
 
 	location.src = filepath.dir(location.file)
