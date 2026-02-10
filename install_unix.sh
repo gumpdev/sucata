@@ -35,7 +35,7 @@ else
   exit 1
 fi
 
-SUCATA_VERSION="0.1.1"
+SUCATA_VERSION="0.2.0"
 SUCATA_BIN="sucata"
 SUCATA_URL="https://github.com/gumpdev/sucata/releases/download/$SUCATA_VERSION/$TARGET.zip"
 SUCATA_DIR="$HOME/sucata"

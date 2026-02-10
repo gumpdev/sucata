@@ -22,7 +22,7 @@ if ($ARCH -eq "X64") {
     exit 1
 }
 
-$SUCATA_VERSION = "0.1.1"
+$SUCATA_VERSION = "0.2.0"
 $SUCATA_NAME = "sucata.exe"
 $SUCATA_URL = "https://github.com/gumpdev/sucata/releases/download/$SUCATA_VERSION/$TARGET.zip"
 $SUCATA_DIR = Join-Path $HOME "sucata"

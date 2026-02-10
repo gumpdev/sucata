@@ -13,3 +13,6 @@ sokol/**/*.a
 *.dSYM/**/*
 temp/*
 teste.*
+__MACOSX/*
+temp.zip
+build/*
