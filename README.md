@@ -14,13 +14,11 @@ An open-source 2D game engine made with Odin programming language and Lua as scr
 - Lua scripting
 - Cross-platform support (Windows, macOS, Linux)
 - Simple and intuitive file system for asset management
-
+- Simple Custom Shader support
 
 #### Future plans
 
-- Make the features better and more optimized
 - More animation features
-- Multiple Shader support
 - Network multiplayer support
 - Particle system
 - Maybe 3D support in the future
@@ -294,8 +292,10 @@ Some libraries used in Sucata Game Engine:
 - [odin](https://odin-lang.org/) - Programming language used to build the engine
 - [lua](https://www.lua.org/) - Scripting language used in the engine
 - [sokol](https://github.com/floooh/sokol) - Cross-platform development libraries for graphics, audio, and input handling
+- [sokol-tools](https://github.com/floooh/sokol-tools) - Cross-platform shader tools for building shader
 - [miniaudio](https://github.com/mackron/miniaudio) - Single file audio playback and capture library
 - [lz4](https://github.com/lz4/lz4) - Fast compression algorithm for asset compression
+- [SDL3](https://github.com/libsdl-org/SDL) - Simple DirectMedia Layer for gamepad support
 
 <br>
 <a id="special-thanks"></a>
