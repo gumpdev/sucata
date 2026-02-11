@@ -44,6 +44,46 @@ void main() {
 @program quad vs fs
 `
 
+FONT_DEFAULT: string = `/* text vertex shader */
+@vs vs
+layout(binding=0) uniform vs_params {
+    mat4 mvp;
+};
+
+in vec2 position;
+in vec4 col;
+in vec2 uv;
+
+out vec4 color;
+out vec2 texcoord;
+
+void main() {
+    gl_Position = mvp * vec4(position, 0.0, 1.0);
+    color = col;
+    texcoord = uv;
+}
+@end
+
+/* text fragment shader */
+@fs fs
+layout(binding=0) uniform texture2D tex;
+layout(binding=0) uniform sampler smp;
+
+in vec4 color;
+in vec2 texcoord;
+
+out vec4 frag_color;
+
+void main() {
+    vec4 tex_color = texture(sampler2D(tex,smp), texcoord);
+    float alpha = tex_color.r * color.a;
+    frag_color = vec4(color.rgb, alpha);
+}
+@end
+
+/* text shader program */
+@program text vs fs
+`
 
 POST_PROCESSING_DEFAULT: string = `/* post-processing vertex shader */
 @vs vs
@@ -83,5 +123,10 @@ create_default_quad :: proc(path: string) {
 
 create_default_post_processing :: proc(path: string) {
 	bytes := transmute([]u8)POST_PROCESSING_DEFAULT
+	os.write_entire_file(path, bytes)
+}
+
+create_default_font_shader :: proc(path: string) {
+	bytes := transmute([]u8)FONT_DEFAULT
 	os.write_entire_file(path, bytes)
 }
