@@ -10,19 +10,7 @@ if (-not $hasExpandArchive -and -not $has7zip) {
     exit 1
 }
 
-
-$ARCH = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
-
-if ($ARCH -eq "X64") {
-    $TARGET = "sucata-win-amd64"
-} elseif ($ARCH -eq "Arm64") {
-    #$TARGET = "sucata-win-arm64"
-    Write-Error "Unsupported Windows architecture: $ARCH"
-    exit 1
-} else {
-    Write-Error "Unsupported Windows architecture: $ARCH"
-    exit 1
-}
+$TARGET = "sucata-win-amd64"
 
 $SUCATA_VERSION = "0.1.2"
 $SUCATA_NAME = "sucata.exe"
