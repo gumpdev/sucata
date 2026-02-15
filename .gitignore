@@ -1,6 +1,7 @@
 sucata.exe
 *.pdb
 *.lua
+*.exe
 sucata
 .DS_Store
 sokol/**/*.dll

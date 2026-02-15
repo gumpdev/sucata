@@ -1,43 +1,29 @@
 package cli
 
-import "../common"
-import core "../core"
-import lua "../lua"
-import path "../path"
+import "core:fmt"
 import "core:os"
+import "core:os/os2"
 import "core:path/filepath"
-import "core:strings"
 
 RUN_COMMAND :: Command {
 	command = "run",
 	args_size = 1,
-	info_msg = "sucata run <file> [--entity <entity_file>] - Run a Sucata Lua script file",
+	info_msg = "sucata run <file> - Run a Sucata Lua script file",
 	error_msg = "Error: 'run' command requires a <file> argument.",
 	handler = proc(args: []string) {
 		file_path := args[0]
 		file_path = filepath.join({os.get_current_directory(), file_path})
+		sucata_path := filepath.join({os.get_current_directory(), "sucata-player.exe"})
 
-		entity_file: string = ""
-		for i := 1; i < len(args); i += 1 {
-			if args[i] == "--entity" && i + 1 < len(args) {
-				entity_file = args[i + 1]
-				i += 1
-			}
+		process_desc := os2.Process_Desc {
+			command = {"cmd", "/C", sucata_path, file_path},
+			stdout  = os2.stdout,
+			stderr  = os2.stderr,
 		}
-
-		path.init_run_paths(file_path)
-
-		if entity_file != "" {
-			common.print_info(
-				"Running entity file: %s on the Sucata project: %s",
-				entity_file,
-				path.location.file,
-			)
-		} else {
-			common.print("Running Sucata project: %s", path.location.file)
+		process, _ := os2.process_start(process_desc)
+		state, _ := os2.process_wait(process)
+		if state.exited {
+			fmt.printfln("Process exited with code: %d", state.exit_code)
 		}
-
-		lua.init_lua(path.location.file, strings.trim_suffix(entity_file, ".lua"))
-		core.main()
 	},
 }
