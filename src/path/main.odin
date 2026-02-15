@@ -1,5 +1,6 @@
 package path
 
+import "core:fmt"
 import "core:strings"
 
 location := PathLocation{}
@@ -14,12 +15,17 @@ PathLocation :: struct {
 }
 
 get_path :: proc(location_path: string) -> string {
-	result_path := location_path
-	ok := false
+	if strings.has_prefix(location_path, "src:/") {
+		return fmt.tprintf("%s/%s", location.src, strings.trim_prefix(location_path, "src://"))
+	}
 
-	result_path, ok = strings.replace_all(result_path, "src:/", location.src)
-	result_path, ok = strings.replace_all(result_path, "data:/", location.data)
-	result_path, ok = strings.replace_all(result_path, "build:/", location.build)
+	if strings.has_prefix(location_path, "data:/") {
+		return fmt.tprintf("%s/%s", location.data, strings.trim_prefix(location_path, "data://"))
+	}
 
-	return result_path
+	if strings.has_prefix(location_path, "build:/") {
+		return fmt.tprintf("%s/%s", location.build, strings.trim_prefix(location_path, "build://"))
+	}
+
+	return location_path
 }

@@ -60,6 +60,8 @@ chmod +x "$SUCATA_BIN"
 ln -sf "$SUCATA_BIN" "$SUCATA_BIN_LINK"
 echo "Sucata installed on $SUCATA_BIN"
 
+rm -f $SUCATA_TEMP_ZIP
+
 LINE='export PATH="$SUCATA_DIR:$PATH"'
 SHELL_NAME="$(basename "$SHELL")"
 

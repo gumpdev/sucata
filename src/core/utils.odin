@@ -2,7 +2,6 @@ package core
 
 import "../common"
 import "core:c"
-import "core:strings"
 import lua "vendor:lua/5.4"
 
 call_lua_function :: proc(L: ^lua.State, function_ref: i32) -> bool {

@@ -3,9 +3,9 @@ package cli
 import "../common"
 import "core:os"
 
-VERSION :: "0.1.2"
+VERSION :: "0.1.3"
 VERSION_TYPE :: "nightly"
-RELEASED_ON :: "2026-02"
+RELEASED_ON :: "2026-03"
 ROOT_COMMAND :: Command {
 	subcommands = {RUN_COMMAND, BUILD_COMMAND, VERSION_COMMAND, SHADER_COMMAND},
 }

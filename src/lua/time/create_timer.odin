@@ -3,7 +3,6 @@ package timenamespace
 import core "../../core"
 import lua_common "../lua_common"
 import "core:c"
-import "core:strings"
 import lua "vendor:lua/5.4"
 
 CREATE_TIMER_FUNCTION :: lua_common.LuaFunction {
@@ -36,9 +35,7 @@ CREATE_TIMER_FUNCTION :: lua_common.LuaFunction {
 		}
 
 		timer_id := core.create_timer(callback_ref, time, auto_start, one_shot, repeat)
-		timer_id_cstring := strings.clone_to_cstring(timer_id)
-		lua.pushstring(L, timer_id_cstring)
-		delete(timer_id_cstring)
+		lua.pushnumber(L, lua.Number(timer_id))
 
 		return 1
 	},

@@ -35,7 +35,7 @@ draw_debug_info :: proc() {
 	frame_time_ms := delta_time * 1000.0
 	lua_memory_kb := f64(lua.gc(LUA_GLOBAL_STATE, lua.GCCOUNT, 0))
 	lua_bmemory_kb := f64(lua.gc(LUA_GLOBAL_STATE, lua.GCCOUNTB, 0))
-	draw_calls := frame_stats.cur_frame.num_draw
+	draw_calls := frame_stats.prev_frame.num_draw
 	alives :=
 		frame_stats.total.buffers.alive +
 		frame_stats.total.images.alive +

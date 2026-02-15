@@ -45,4 +45,6 @@ if ($CURRENT_PATH -notlike "*$SUCATA_DIR*") {
     Write-Host "PATH already contains $SUCATA_DIR"
 }
 
+Remove-Item $TEMP_ZIP
+
 Write-Host "Done! Restart your terminal to use sucata."

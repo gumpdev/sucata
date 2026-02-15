@@ -60,7 +60,7 @@ load_image :: proc(file_path: string) -> Image {
 		{
 			width = w,
 			height = h,
-			pixel_format = .DEFAULT,
+			pixel_format = .RGBA8,
 			data = {mip_levels = {0 = {ptr = pixels, size = uint(w * h * 4)}}},
 		},
 	)

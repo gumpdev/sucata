@@ -84,7 +84,9 @@ remove_gamepad :: proc(id: sdl3.JoystickID) {
 			if gamepads[i].gamepad != nil {
 				sdl3.CloseGamepad(gamepads[i].gamepad)
 			}
-			delete(gamepads[i].name)
+			if gamepads[i].name != "" {
+				delete(gamepads[i].name)
+			}
 			gamepads[i] = {}
 			break
 		}
@@ -170,6 +172,9 @@ shutdown_gamepad :: proc() {
 	for i in 0 ..< MAX_GAMEPADS {
 		if gamepads[i].connected && gamepads[i].gamepad != nil {
 			sdl3.CloseGamepad(gamepads[i].gamepad)
+		}
+		if gamepads[i].name != "" {
+			delete(gamepads[i].name)
 		}
 		gamepads[i] = {}
 	}

@@ -1,7 +1,5 @@
 package core
 
-import "core:crypto"
-import "core:encoding/uuid"
 import lua "vendor:lua/5.4"
 
 Timer :: struct {
@@ -13,7 +11,8 @@ Timer :: struct {
 	repeat:    bool,
 }
 
-timers := map[string]^Timer{}
+timers: map[u64]^Timer = {}
+next_timer_id: u64 = 1
 
 create_timer :: proc(
 	callback_ref: i32,
@@ -21,10 +20,9 @@ create_timer :: proc(
 	auto_start: bool,
 	one_shot: bool,
 	repeat: bool,
-) -> string {
-	context.random_generator = crypto.random_generator()
-
-	id := uuid.to_string(uuid.generate_v4())
+) -> u64 {
+	id := next_timer_id
+	next_timer_id += 1
 
 	timer := new(Timer)
 	timer.callback = callback_ref
@@ -39,17 +37,19 @@ create_timer :: proc(
 	return id
 }
 
-start_timer :: proc(id: string) {
+start_timer :: proc(id: u64) {
 	if timer := timers[id]; timer != nil {
 		timer.running = true
 	}
 }
-pause_timer :: proc(id: string) {
+
+pause_timer :: proc(id: u64) {
 	if timer := timers[id]; timer != nil {
 		timer.running = false
 	}
 }
-stop_timer :: proc(id: string) {
+
+stop_timer :: proc(id: u64) {
 	if timer := timers[id]; timer != nil {
 		lua.L_unref(LUA_GLOBAL_STATE, lua.REGISTRYINDEX, timer.callback)
 		delete_key(&timers, id)
@@ -58,20 +58,21 @@ stop_timer :: proc(id: string) {
 }
 
 update_timers :: proc(delta_time: f64) {
-	timers_to_stop := make([dynamic]string, context.temp_allocator)
+	timers_to_stop := make([dynamic]u64, context.temp_allocator)
 
 	for id, timer in timers {
 		if timer.running {
 			timer.left_time -= delta_time
 			if timer.left_time <= 0 {
 				call_lua_function(LUA_GLOBAL_STATE, timer.callback)
+
 				if timer.repeat {
 					timer.left_time = timer.time
 				} else {
 					if timer.one_shot {
 						append(&timers_to_stop, id)
 					} else {
-						pause_timer(id)
+						timer.running = false
 					}
 				}
 			}
