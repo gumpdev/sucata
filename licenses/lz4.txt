@@ -1,0 +1,2 @@
+This product includes LZ4, licensed under the BSD 2-Clause License.
+Copyright (c) Yann Collet

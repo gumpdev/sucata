@@ -1,0 +1,3 @@
+Copyright (C) 1994-2024 Lua.org, PUC-Rio.
+
+Licensed under the MIT License.

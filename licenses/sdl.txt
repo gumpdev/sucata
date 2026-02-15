@@ -1,0 +1,3 @@
+Copyright (c) 1997-2026 Sam Lantinga <slouken@libsdl.org>
+
+Licensed under the zLib License.
