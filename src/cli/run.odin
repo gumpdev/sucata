@@ -1,5 +1,6 @@
 package cli
 
+import "../path"
 import "core:fmt"
 import "core:os"
 import "core:os/os2"
@@ -13,7 +14,7 @@ RUN_COMMAND :: Command {
 	handler = proc(args: []string) {
 		file_path := args[0]
 		file_path = filepath.join({os.get_current_directory(), file_path})
-		sucata_path := filepath.join({os.get_current_directory(), "sucata-player.exe"})
+		sucata_path := path.get_sucata_player_path()
 
 		process_desc := os2.Process_Desc {
 			command = {"cmd", "/C", sucata_path, file_path},

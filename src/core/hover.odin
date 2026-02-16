@@ -42,8 +42,7 @@ process_hoverables :: proc() {
 		return 0
 	})
 
-	mouse_x := input_state.mouse_pos[0]
-	mouse_y := input_state.mouse_pos[1]
+	mouse_x, mouse_y := mouse_position()
 
 	if camera.camera.rotation != 0 {
 		cos_r := math.cos(-camera.camera.rotation)

@@ -13,14 +13,7 @@ LUA_DLL_FILE_NAME :: "lua54.dll"
 SDL_DLL_FILE_NAME :: "SDL3.dll"
 
 clone_engine :: proc(output_dir: string, assets_hash: string, icon_path: string = "") {
-	executable_path := path.get_executable_path()
-	executable_dir := filepath.dir(executable_path)
-	player_path := ""
-	when ODIN_OS == .Windows {
-		player_path = filepath.join({executable_dir, "sucata-player.exe"})
-	} else {
-		player_path = filepath.join({executable_dir, "sucata-player"})
-	}
+	player_path := path.get_sucata_player_path()
 	common.print_info("Cloning engine from: %s", player_path)
 
 	engine_data, read_ok := os.read_entire_file(player_path)

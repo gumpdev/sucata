@@ -73,6 +73,18 @@ get_config_dir :: proc(system: string) -> string {
 	return "."
 }
 
+get_sucata_player_path :: proc() -> string {
+	executable_path := get_executable_path()
+	executable_dir := filepath.dir(executable_path)
+	player_path := ""
+	when ODIN_OS == .Windows {
+		player_path = filepath.join({executable_dir, "sucata-player.exe"})
+	} else {
+		player_path = filepath.join({executable_dir, "sucata-player"})
+	}
+	return player_path
+}
+
 get_executable_path :: proc() -> string {
 	arg0 := os.args[0]
 
