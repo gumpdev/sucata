@@ -109,7 +109,7 @@ update :: proc(entity: ^common.Entity) {
 
 run_draw :: proc() {
 	draw_debug_info()
-	if scene == nil || len(scene) == 0 {
+	if scene == nil {
 		return
 	}
 	for &entity in scene {

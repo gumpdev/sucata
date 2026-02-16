@@ -4,6 +4,7 @@ import camera "../camera"
 import "core:math"
 import "core:sort"
 import "core:strings"
+
 Hoverable :: struct {
 	id:      string,
 	x:       f32,
@@ -38,9 +39,9 @@ process_hoverables :: proc() {
 
 	_hoverables := hoverables[:]
 	sort.quick_sort_proc(_hoverables, proc(a, b: Hoverable) -> int {
-		if a.z_index < b.z_index {
+		if a.z_index > b.z_index {
 			return -1
-		} else if a.z_index > b.z_index {
+		} else if a.z_index < b.z_index {
 			return 1
 		}
 		return 0
@@ -79,6 +80,9 @@ process_hoverables :: proc() {
 			}
 		}
 	}
+}
+
+clear_hoverables :: proc() {
 	for hoverable in hoverables {
 		delete(hoverable.id)
 	}

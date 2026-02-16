@@ -186,6 +186,7 @@ frame_callback :: proc "c" () {
 	clear_input()
 	clear_gamepad_states()
 	process_destroy_queue()
+	clear_hoverables()
 
 	if LUA_GLOBAL_STATE != nil {
 		lua.gc(LUA_GLOBAL_STATE, lua.GCSTEP, 5)
