@@ -17,7 +17,7 @@ RUN_COMMAND :: Command {
 		sucata_path := path.get_sucata_player_path()
 
 		process_desc := os2.Process_Desc {
-			command = {"cmd", "/C", sucata_path, file_path},
+			command = {sucata_path, file_path},
 			stdout  = os2.stdout,
 			stderr  = os2.stderr,
 		}
