@@ -1,3 +1,7 @@
+> [!WARNING]
+> This repository has [moved to codeberg](https://codeberg.org/sucata/sucata/)
+
+
 # 🔩 Sucata Game Engine
 
 An open-source 2D game engine made with Odin programming language and Lua as scripting language, inspired by Love2D and Godot Engine.
